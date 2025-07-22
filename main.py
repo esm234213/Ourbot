@@ -192,7 +192,7 @@ def main():
     
     # Add handlers for admin group messages (replies and media)
     application.add_handler(MessageHandler(
-        filters.Chat(ADMIN_GROUP_ID) & (filters.TEXT | filters.PHOTO | filters.VIDEO | filters.DOCUMENT | filters.VOICE | filters.VIDEO_NOTE),
+        filters.Chat(ADMIN_GROUP_ID) & (filters.TEXT | filters.PHOTO | filters.VIDEO | filters.Document.ALL | filters.Voice.ALL | filters.VideoNote.ALL),
         handle_admin_reply
     ))
     
