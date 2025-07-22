@@ -408,9 +408,7 @@ async def send_admin_notification(context: CallbackContext, application_data: di
 
 📅 <b>وقت التقديم:</b> {application_data['timestamp'][:19]}
 
-💬 <b>للرد على المتقدم:</b> 
-• رد على هذه الرسالة (نص، صورة، فيديو، ملف)
-• أو ابدأ رسالة جديدة بـ: {user_info['user_id']}: رسالتك هنا
+💬 <b>للرد على المتقدم:</b> رد على هذه الرسالة وسيتم إرسال ردك إليه تلقائياً
 """
         
         # Create inline keyboard with accept/reject buttons
@@ -593,178 +591,66 @@ async def cancel_command(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
-    """Handle admin replies to applications (text, photo, video, or document)."""
+    """Handle admin replies to application notifications."""
     try:
         # Check if message is from admin group
         if update.effective_chat.id != ADMIN_GROUP_ID:
             return
         
-        user_id = None
-        reply_content = None
-        content_type = "text"
-        
-        # Check if this is a reply to a notification message
-        if update.message.reply_to_message:
-            # Extract user ID from the replied message
-            replied_text = update.message.reply_to_message.text or update.message.reply_to_message.caption or ""
-            
-            # Look for user ID pattern in the replied message
-            import re
-            user_id_match = re.search(r'معرف المستخدم:</b> (\d+)', replied_text)
-            if user_id_match:
-                user_id = int(user_id_match.group(1))
-        else:
-            # If no reply, check if message starts with user ID (format: 123456: message)
-            message_text = update.message.text or update.message.caption or ""
-            if message_text:
-                import re
-                user_id_match = re.match(r'^(\d+):\s*(.+)', message_text, re.DOTALL)
-                if user_id_match:
-                    user_id = int(user_id_match.group(1))
-                    # Update the message content to remove the user ID prefix
-                    if update.message.text:
-                        reply_content = user_id_match.group(2)
-                    elif update.message.caption:
-                        # For media with caption, update the caption
-                        reply_content = user_id_match.group(2)
-        
-        if not user_id:
-            # If no user ID found, send help message
-            await update.message.reply_text(
-                "⚠️ لم أتمكن من تحديد المستخدم المراد الرد عليه.\n\n"
-                "طرق الرد المتاحة:\n"
-                "1️⃣ رد على رسالة الإشعار مباشرة\n"
-                "2️⃣ ابدأ الرسالة بمعرف المستخدم: 123456: رسالتك هنا"
-            )
+        # Check if this is a reply to a bot message
+        if not update.message.reply_to_message:
             return
         
-        # Determine content type and prepare message
-        if update.message.photo:
-            content_type = "photo"
-            file_id = update.message.photo[-1].file_id
-            reply_content = reply_content or update.message.caption or ""
-        elif update.message.video:
-            content_type = "video"
-            file_id = update.message.video.file_id
-            reply_content = reply_content or update.message.caption or ""
-        elif update.message.document:
-            content_type = "document"
-            file_id = update.message.document.file_id
-            reply_content = reply_content or update.message.caption or ""
-        elif update.message.voice:
-            content_type = "voice"
-            file_id = update.message.voice.file_id
-            reply_content = reply_content or ""
-        elif update.message.video_note:
-            content_type = "video_note"
-            file_id = update.message.video_note.file_id
-            reply_content = reply_content or ""
-        else:
-            content_type = "text"
-            reply_content = reply_content or update.message.text or ""
+        replied_message_id = update.message.reply_to_message.message_id
         
-        if not reply_content and content_type == "text":
-            await update.message.reply_text("⚠️ لا يمكن إرسال رسالة فارغة.")
+        # Check if we have a mapping for this message
+        if replied_message_id not in admin_message_to_user:
             return
         
-        # Send the reply to the user
-        try:
-            if content_type == "photo":
-                if reply_content:
-                    await context.bot.send_photo(
-                        chat_id=user_id,
-                        photo=file_id,
-                        caption=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                        parse_mode='HTML'
-                    )
-                else:
-                    await context.bot.send_photo(
-                        chat_id=user_id,
-                        photo=file_id,
-                        caption="💬 <b>رد من الإدارة</b>",
-                        parse_mode='HTML'
-                    )
-            elif content_type == "video":
-                if reply_content:
-                    await context.bot.send_video(
-                        chat_id=user_id,
-                        video=file_id,
-                        caption=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                        parse_mode='HTML'
-                    )
-                else:
-                    await context.bot.send_video(
-                        chat_id=user_id,
-                        video=file_id,
-                        caption="💬 <b>رد من الإدارة</b>",
-                        parse_mode='HTML'
-                    )
-            elif content_type == "document":
-                if reply_content:
-                    await context.bot.send_document(
-                        chat_id=user_id,
-                        document=file_id,
-                        caption=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                        parse_mode='HTML'
-                    )
-                else:
-                    await context.bot.send_document(
-                        chat_id=user_id,
-                        document=file_id,
-                        caption="💬 <b>رد من الإدارة</b>",
-                        parse_mode='HTML'
-                    )
-            elif content_type == "voice":
-                await context.bot.send_voice(
-                    chat_id=user_id,
-                    voice=file_id
-                )
-                if reply_content:
-                    await context.bot.send_message(
-                        chat_id=user_id,
-                        text=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                        parse_mode='HTML'
-                    )
-            elif content_type == "video_note":
-                await context.bot.send_video_note(
-                    chat_id=user_id,
-                    video_note=file_id
-                )
-                if reply_content:
-                    await context.bot.send_message(
-                        chat_id=user_id,
-                        text=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                        parse_mode='HTML'
-                    )
-            else:  # text
-                await context.bot.send_message(
-                    chat_id=user_id,
-                    text=f"💬 <b>رد من الإدارة:</b>\n\n{reply_content}",
-                    parse_mode='HTML'
-                )
-            
-            # Confirm to admin
-            await update.message.reply_text(
-                f"✅ تم إرسال الرد إلى المستخدم {user_id} بنجاح!"
-            )
-            
-            logger.info(f"Admin reply sent to user {user_id}, content type: {content_type}")
-            
-        except Exception as e:
-            if "chat not found" in str(e).lower() or "user not found" in str(e).lower():
-                await update.message.reply_text(
-                    f"❌ لم أتمكن من إرسال الرسالة للمستخدم {user_id}.\n"
-                    "السبب: المستخدم حظر البوت أو حذف حسابه."
-                )
-            else:
-                await update.message.reply_text(
-                    f"❌ حدث خطأ في إرسال الرد للمستخدم {user_id}:\n{str(e)}"
-                )
-            logger.error(f"Error sending admin reply to user {user_id}: {e}")
+        # Get the original user ID
+        user_id = admin_message_to_user[replied_message_id]
+        
+        # Get admin info
+        admin_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            admin_name += f" {update.effective_user.last_name}"
+        
+        admin_id = update.effective_user.id
+        
+        # Start/update conversation tracking
+        active_conversations[user_id] = {
+            'admin_id': admin_id,
+            'admin_name': admin_name,
+            'active': True
+        }
+        
+        # Format the reply message
+        reply_text = f"""
+📩 <b>رد من فريق Our Goal:</b>
+
+{update.message.text}
+
+---
+📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
+"""
+        
+        # Send reply to the original user
+        await context.bot.send_message(
+            chat_id=user_id,
+            text=reply_text,
+            parse_mode='HTML'
+        )
+        
+        # React to the admin message to show it was sent
+        await update.message.reply_text("✅ تم إرسال الرد للمتقدم بنجاح")
+        
+        logger.info(f"Admin reply sent from {admin_id} to user {user_id}")
         
     except Exception as e:
-        logger.error(f"Error in handle_admin_reply: {e}")
-        await update.message.reply_text(ERROR_MESSAGE)
+        logger.error(f"Failed to send admin reply: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الرد للمتقدم")
 
 async def handle_admin_decision(update: Update, context: CallbackContext) -> None:
     """Handle admin accept/reject button clicks."""
@@ -970,4 +856,3 @@ async def handle_unknown_message(update: Update, context: CallbackContext) -> No
     except Exception as e:
         logger.error(f"Error in handle_unknown_message: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
-
