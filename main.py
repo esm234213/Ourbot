@@ -13,8 +13,10 @@ from handlers import (
     help_command,
     status_command,
     team_selection_callback,
+    handle_gender_selection,
     handle_reason_input,
     handle_experience_input,
+    handle_whatsapp_input,
     cancel_command,
     stats_command,
     broadcast_command,
@@ -24,8 +26,10 @@ from handlers import (
     handle_admin_decision,
     handle_end_conversation,
     handle_unknown_message,
+    ASKING_GENDER,
     ASKING_REASON,
     ASKING_EXPERIENCE,
+    ASKING_WHATSAPP,
     ASKING_BROADCAST_MESSAGE
 )
 from config import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
@@ -131,11 +135,17 @@ def main():
             CallbackQueryHandler(team_selection_callback, pattern="^team_")
         ],
         states={
+            ASKING_GENDER: [
+                CallbackQueryHandler(handle_gender_selection, pattern="^gender_")
+            ],
             ASKING_REASON: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_reason_input)
             ],
             ASKING_EXPERIENCE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_experience_input)
+            ],
+            ASKING_WHATSAPP: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_whatsapp_input)
             ],
         },
         fallbacks=[
