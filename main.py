@@ -7,7 +7,7 @@ import sys
 from dotenv import load_dotenv
 from telegram import BotCommand, MenuButton, MenuButtonCommands
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, filters
-from handlers_enhanced import (
+from handlers import (
     start_command,
     menu_command,
     help_command,
