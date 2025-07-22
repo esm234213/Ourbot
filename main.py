@@ -7,7 +7,7 @@ import sys
 from dotenv import load_dotenv
 from telegram import BotCommand, MenuButton, MenuButtonCommands
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, filters
-from handlers import (
+from handlers_enhanced import (
     start_command,
     menu_command,
     help_command,
@@ -26,13 +26,20 @@ from handlers import (
     handle_admin_decision,
     handle_end_conversation,
     handle_unknown_message,
+    # New media handlers
+    handle_admin_photo,
+    handle_admin_video,
+    handle_admin_audio,
+    handle_user_photo,
+    handle_user_video,
+    handle_user_audio,
     ASKING_GENDER,
     ASKING_REASON,
     ASKING_EXPERIENCE,
     ASKING_WHATSAPP,
     ASKING_BROADCAST_MESSAGE
 )
-from config import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
+from config_enhanced import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
 
 # Configure logging
 logging.basicConfig(
@@ -110,7 +117,7 @@ async def error_handler(update, context):
 
 def main():
     """Start the bot."""
-    logger.info(f"Starting {BOT_NAME} v{BOT_VERSION}")
+    logger.info(f"Starting {BOT_NAME} v{BOT_VERSION} with Enhanced Media Support")
     
     # Validate environment
     if not validate_environment():
@@ -190,18 +197,51 @@ def main():
     # Handle end conversation button
     application.add_handler(CallbackQueryHandler(handle_end_conversation, pattern="^end_chat_"))
     
-    # Handle admin replies (only from admin group)
+    # Handle admin media messages (only from admin group)
+    application.add_handler(MessageHandler(
+        filters.PHOTO & filters.Chat(ADMIN_GROUP_ID), 
+        handle_admin_photo
+    ))
+    
+    application.add_handler(MessageHandler(
+        filters.VIDEO & filters.Chat(ADMIN_GROUP_ID), 
+        handle_admin_video
+    ))
+    
+    application.add_handler(MessageHandler(
+        (filters.AUDIO | filters.VOICE) & filters.Chat(ADMIN_GROUP_ID), 
+        handle_admin_audio
+    ))
+    
+    # Handle admin text replies (only from admin group)
     application.add_handler(MessageHandler(
         filters.TEXT & ~filters.COMMAND & filters.Chat(ADMIN_GROUP_ID), 
         handle_admin_reply
     ))
     
-    # Handle unknown messages (must be last)
+    # Handle user media messages (not from admin group)
+    application.add_handler(MessageHandler(
+        filters.PHOTO & ~filters.Chat(ADMIN_GROUP_ID), 
+        handle_user_photo
+    ))
+    
+    application.add_handler(MessageHandler(
+        filters.VIDEO & ~filters.Chat(ADMIN_GROUP_ID), 
+        handle_user_video
+    ))
+    
+    application.add_handler(MessageHandler(
+        (filters.AUDIO | filters.VOICE) & ~filters.Chat(ADMIN_GROUP_ID), 
+        handle_user_audio
+    ))
+    
+    # Handle unknown text messages (must be last)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_message))
     
     # Log startup
-    logger.info(f"{BOT_NAME} started successfully!")
+    logger.info(f"{BOT_NAME} started successfully with enhanced media support!")
     logger.info(f"Admin Group ID: {ADMIN_GROUP_ID}")
+    logger.info("Supported media types: Photos, Videos, Audio, Voice messages")
     
     # Run the bot
     try:
@@ -217,3 +257,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
