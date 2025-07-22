@@ -190,9 +190,9 @@ def main():
     # Handle end conversation button
     application.add_handler(CallbackQueryHandler(handle_end_conversation, pattern="^end_chat_"))
     
-    # Add handlers for admin group messages (replies and media)
+    # Handle admin replies (only from admin group)
     application.add_handler(MessageHandler(
-        filters.Chat(ADMIN_GROUP_ID) & (filters.TEXT | filters.PHOTO | filters.VIDEO | filters.Document.ALL | filters.Voice.ALL | filters.VideoNote.ALL),
+        filters.TEXT & ~filters.COMMAND & filters.Chat(ADMIN_GROUP_ID), 
         handle_admin_reply
     ))
     
@@ -217,4 +217,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
