@@ -165,16 +165,55 @@ async def team_selection_callback(update: Update, context: CallbackContext) -> i
             'timestamp': datetime.now().isoformat()
         }
         
-        # Ask for reason
+        # Ask for gender first
+        gender_keyboard = [
+            [
+                InlineKeyboardButton("👨 ذكر", callback_data=f"gender_male_{team_id}"),
+                InlineKeyboardButton("👩 أنثى", callback_data=f"gender_female_{team_id}")
+            ]
+        ]
+        gender_reply_markup = InlineKeyboardMarkup(gender_keyboard)
+        
         await query.edit_message_text(
-            TEAM_SELECTION_MESSAGE.format(team_name=team_name)
+            TEAM_SELECTION_MESSAGE.format(team_name=team_name),
+            reply_markup=gender_reply_markup
         )
         
         logger.info(f"User {user.id} selected team {team_id}")
-        return ASKING_REASON
+        return ASKING_GENDER
         
     except Exception as e:
         logger.error(f"Error in team_selection_callback: {e}")
+        await query.edit_message_text(ERROR_MESSAGE)
+        return ConversationHandler.END
+
+async def handle_gender_selection(update: Update, context: CallbackContext) -> int:
+    """Handle gender selection from inline keyboard."""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        # Parse callback data: gender_male_team_id or gender_female_team_id
+        callback_parts = query.data.split("_")
+        gender = callback_parts[1]  # male or female
+        team_id = callback_parts[2]  # team_id
+        
+        # Store gender in context
+        context.user_data['gender'] = "ذكر" if gender == "male" else "أنثى"
+        
+        # Get team name
+        team_name = context.user_data.get('team_name', TEAMS.get(team_id, "غير معروف"))
+        
+        # Ask for reason
+        await query.edit_message_text(
+            GENDER_QUESTION.format(team_name=team_name)
+        )
+        
+        logger.info(f"User {update.effective_user.id} selected gender: {context.user_data['gender']}")
+        return ASKING_REASON
+        
+    except Exception as e:
+        logger.error(f"Error in handle_gender_selection: {e}")
         await query.edit_message_text(ERROR_MESSAGE)
         return ConversationHandler.END
 
@@ -213,9 +252,10 @@ async def handle_reason_input(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 async def handle_experience_input(update: Update, context: CallbackContext) -> int:
-    """Handle user's experience input and complete application."""
+    """Handle user's experience input and check if WhatsApp number is needed."""
     try:
         user_experience = update.message.text.strip()
+        user = update.effective_user
         
         # Validate input length
         if len(user_experience) < 5:
@@ -233,13 +273,78 @@ async def handle_experience_input(update: Update, context: CallbackContext) -> i
         # Store experience in context
         context.user_data['experience'] = user_experience
         
+        # Check if user has username
+        if not user.username:
+            # User doesn't have username, ask for WhatsApp number
+            await update.message.reply_text(WHATSAPP_QUESTION)
+            return ASKING_WHATSAPP
+        else:
+            # User has username, complete application
+            return await complete_application(update, context)
+        
+    except Exception as e:
+        logger.error(f"Error in handle_experience_input: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+        return ConversationHandler.END
+
+async def handle_whatsapp_input(update: Update, context: CallbackContext) -> int:
+    """Handle WhatsApp number input and complete application."""
+    try:
+        whatsapp_number = update.message.text.strip()
+        
+        # Validate WhatsApp number format
+        if not validate_whatsapp_number(whatsapp_number):
+            await update.message.reply_text(
+                "⚠️ رقم الواتساب غير صحيح. يرجى كتابة الرقم بالتنسيق الصحيح.\n\n🇪🇬 مصر: +201234567890 أو 01234567890\n🇸🇦 السعودية: +966512345678 أو 0512345678"
+            )
+            return ASKING_WHATSAPP
+        
+        # Store WhatsApp number in context
+        context.user_data['whatsapp_number'] = whatsapp_number
+        
+        # Complete application
+        return await complete_application(update, context)
+        
+    except Exception as e:
+        logger.error(f"Error in handle_whatsapp_input: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+        return ConversationHandler.END
+
+def validate_whatsapp_number(number: str) -> bool:
+    """Validate WhatsApp number format for Egyptian and Saudi numbers."""
+    import re
+    
+    # Remove spaces and common separators
+    clean_number = re.sub(r'[\s\-\(\)]', '', number)
+    
+    # Check if it's a valid Egyptian or Saudi phone number format
+    # Egyptian mobile numbers: +201xxxxxxxx, 01xxxxxxxx (010, 011, 012, 015)
+    # Saudi mobile numbers: +9665xxxxxxxx, 05xxxxxxxx (050-059)
+    patterns = [
+        # Egyptian numbers
+        r'^(\+?20(1[0125]|10|11|12|15)[0-9]{8}|0(1[0125]|10|11|12|15)[0-9]{8})$',
+        # Saudi numbers  
+        r'^(\+?966(5[0-9])[0-9]{7}|0(5[0-9])[0-9]{7})$'
+    ]
+    
+    for pattern in patterns:
+        if re.match(pattern, clean_number):
+            return True
+    
+    return False
+
+async def complete_application(update: Update, context: CallbackContext) -> int:
+    """Complete the application process."""
+    try:
         # Prepare application data
         application_data = {
             'user_info': context.user_data['user_info'],
             'selected_team': context.user_data['selected_team'],
             'team_name': context.user_data['team_name'],
+            'gender': context.user_data['gender'],
             'reason': context.user_data['reason'],
-            'experience': user_experience,
+            'experience': context.user_data['experience'],
+            'whatsapp_number': context.user_data.get('whatsapp_number', None),
             'timestamp': datetime.now().isoformat()
         }
         
@@ -265,7 +370,7 @@ async def handle_experience_input(update: Update, context: CallbackContext) -> i
         return ConversationHandler.END
         
     except Exception as e:
-        logger.error(f"Error in handle_experience_input: {e}")
+        logger.error(f"Error in complete_application: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
         return ConversationHandler.END
 
@@ -281,12 +386,18 @@ async def send_admin_notification(context: CallbackContext, application_data: di
         
         username_text = f"(@{user_info['username']})" if user_info['username'] else "(لا يوجد username)"
         
+        # Add WhatsApp number if available
+        whatsapp_info = ""
+        if application_data.get('whatsapp_number'):
+            whatsapp_info = f"\n📱 <b>رقم الواتساب:</b> {application_data['whatsapp_number']}"
+        
         # Create notification message
         notification_text = f"""
 🆕 <b>طلب تقديم جديد!</b>
 
 👤 <b>المتقدم:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_info['user_id']}
+🆔 <b>معرف المستخدم:</b> {user_info['user_id']}{whatsapp_info}
+👫 <b>الجنس:</b> {application_data['gender']}
 🎯 <b>التيم:</b> {application_data['team_name']}
 
 ❓ <b>سبب الانضمام:</b>
