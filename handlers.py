@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
-from config import *
+from config_enhanced import *
 from data_manager import DataManager
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,16 @@ active_conversations = {}
 
 # Conversation states for broadcast
 ASKING_BROADCAST_MESSAGE = 10
+
+# Media directories
+MEDIA_DIR = "media"
+IMAGES_DIR = os.path.join(MEDIA_DIR, "images")
+VIDEOS_DIR = os.path.join(MEDIA_DIR, "videos")
+AUDIO_DIR = os.path.join(MEDIA_DIR, "audio")
+
+# Create media directories if they don't exist
+for directory in [MEDIA_DIR, IMAGES_DIR, VIDEOS_DIR, AUDIO_DIR]:
+    os.makedirs(directory, exist_ok=True)
 
 async def start_command(update: Update, context: CallbackContext) -> None:
     """Handle /start command - show welcome message and team selection buttons."""
@@ -80,6 +91,10 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 4. سيتم إرسال طلبك للإدارة
 
 🔄 يمكنك الضغط على /start في أي وقت للتقديم على تيم جديد
+
+📱 <b>الميزات الجديدة:</b>
+• دعم الرد بالصور والفيديو والصوت
+• تفاعل محسن مع الإدارة
 """
         
         await update.message.reply_text(menu_text, parse_mode='HTML')
@@ -409,6 +424,7 @@ async def send_admin_notification(context: CallbackContext, application_data: di
 📅 <b>وقت التقديم:</b> {application_data['timestamp'][:19]}
 
 💬 <b>للرد على المتقدم:</b> رد على هذه الرسالة وسيتم إرسال ردك إليه تلقائياً
+📷 <b>يمكنك الرد بالصور والفيديو والصوت أيضاً!</b>
 """
         
         # Create inline keyboard with accept/reject buttons
@@ -435,6 +451,492 @@ async def send_admin_notification(context: CallbackContext, application_data: di
     except Exception as e:
         logger.error(f"Failed to send admin notification: {e}")
 
+# Enhanced media handling functions
+async def save_media_file(file, media_type: str, user_id: int) -> str:
+    """Save media file and return the file path."""
+    try:
+        # Get file info
+        file_info = await file.get_file()
+        
+        # Determine file extension
+        file_extension = os.path.splitext(file_info.file_path)[1]
+        if not file_extension:
+            if media_type == "photo":
+                file_extension = ".jpg"
+            elif media_type == "video":
+                file_extension = ".mp4"
+            elif media_type == "audio":
+                file_extension = ".ogg"
+            elif media_type == "voice":
+                file_extension = ".ogg"
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{user_id}_{timestamp}{file_extension}"
+        
+        # Determine directory based on media type
+        if media_type == "photo":
+            directory = IMAGES_DIR
+        elif media_type == "video":
+            directory = VIDEOS_DIR
+        elif media_type in ["audio", "voice"]:
+            directory = AUDIO_DIR
+        else:
+            directory = MEDIA_DIR
+        
+        # Full file path
+        file_path = os.path.join(directory, filename)
+        
+        # Download and save file
+        await file_info.download_to_drive(file_path)
+        
+        logger.info(f"Media file saved: {file_path}")
+        return file_path
+        
+    except Exception as e:
+        logger.error(f"Failed to save media file: {e}")
+        return None
+
+async def handle_admin_photo(update: Update, context: CallbackContext) -> None:
+    """Handle photo messages from admin."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            return
+        
+        # Check if this is a reply to a bot message
+        if not update.message.reply_to_message:
+            return
+        
+        replied_message_id = update.message.reply_to_message.message_id
+        
+        # Check if we have a mapping for this message
+        if replied_message_id not in admin_message_to_user:
+            return
+        
+        # Get the original user ID
+        user_id = admin_message_to_user[replied_message_id]
+        
+        # Get admin info
+        admin_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            admin_name += f" {update.effective_user.last_name}"
+        
+        # Save the photo
+        photo = update.message.photo[-1]  # Get highest resolution
+        file_path = await save_media_file(photo, "photo", update.effective_user.id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في حفظ الصورة")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n{update.message.caption}"
+        
+        reply_text = f"""
+📩 <b>رد من فريق Our Goal:</b>
+
+📷 تم إرسال صورة{caption}
+
+---
+📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
+"""
+        
+        # Send photo to the original user
+        with open(file_path, 'rb') as photo_file:
+            await context.bot.send_photo(
+                chat_id=user_id,
+                photo=photo_file,
+                caption=reply_text,
+                parse_mode='HTML'
+            )
+        
+        # React to the admin message to show it was sent
+        await update.message.reply_text("✅ تم إرسال الصورة للمتقدم بنجاح")
+        
+        logger.info(f"Admin photo sent from {update.effective_user.id} to user {user_id}")
+        
+    except Exception as e:
+        logger.error(f"Failed to send admin photo: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الصورة للمتقدم")
+
+async def handle_admin_video(update: Update, context: CallbackContext) -> None:
+    """Handle video messages from admin."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            return
+        
+        # Check if this is a reply to a bot message
+        if not update.message.reply_to_message:
+            return
+        
+        replied_message_id = update.message.reply_to_message.message_id
+        
+        # Check if we have a mapping for this message
+        if replied_message_id not in admin_message_to_user:
+            return
+        
+        # Get the original user ID
+        user_id = admin_message_to_user[replied_message_id]
+        
+        # Get admin info
+        admin_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            admin_name += f" {update.effective_user.last_name}"
+        
+        # Save the video
+        video = update.message.video
+        file_path = await save_media_file(video, "video", update.effective_user.id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في حفظ الفيديو")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n{update.message.caption}"
+        
+        reply_text = f"""
+📩 <b>رد من فريق Our Goal:</b>
+
+🎥 تم إرسال فيديو{caption}
+
+---
+📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
+"""
+        
+        # Send video to the original user
+        with open(file_path, 'rb') as video_file:
+            await context.bot.send_video(
+                chat_id=user_id,
+                video=video_file,
+                caption=reply_text,
+                parse_mode='HTML'
+            )
+        
+        # React to the admin message to show it was sent
+        await update.message.reply_text("✅ تم إرسال الفيديو للمتقدم بنجاح")
+        
+        logger.info(f"Admin video sent from {update.effective_user.id} to user {user_id}")
+        
+    except Exception as e:
+        logger.error(f"Failed to send admin video: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الفيديو للمتقدم")
+
+async def handle_admin_audio(update: Update, context: CallbackContext) -> None:
+    """Handle audio/voice messages from admin."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            return
+        
+        # Check if this is a reply to a bot message
+        if not update.message.reply_to_message:
+            return
+        
+        replied_message_id = update.message.reply_to_message.message_id
+        
+        # Check if we have a mapping for this message
+        if replied_message_id not in admin_message_to_user:
+            return
+        
+        # Get the original user ID
+        user_id = admin_message_to_user[replied_message_id]
+        
+        # Get admin info
+        admin_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            admin_name += f" {update.effective_user.last_name}"
+        
+        # Determine if it's audio or voice
+        if update.message.audio:
+            audio_file = update.message.audio
+            media_type = "audio"
+            media_emoji = "🎵"
+            media_name = "ملف صوتي"
+        elif update.message.voice:
+            audio_file = update.message.voice
+            media_type = "voice"
+            media_emoji = "🎤"
+            media_name = "رسالة صوتية"
+        else:
+            return
+        
+        # Save the audio file
+        file_path = await save_media_file(audio_file, media_type, update.effective_user.id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في حفظ الملف الصوتي")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n{update.message.caption}"
+        
+        reply_text = f"""
+📩 <b>رد من فريق Our Goal:</b>
+
+{media_emoji} تم إرسال {media_name}{caption}
+
+---
+📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
+"""
+        
+        # Send audio to the original user
+        with open(file_path, 'rb') as audio_file_obj:
+            if media_type == "audio":
+                await context.bot.send_audio(
+                    chat_id=user_id,
+                    audio=audio_file_obj,
+                    caption=reply_text,
+                    parse_mode='HTML'
+                )
+            else:  # voice
+                await context.bot.send_voice(
+                    chat_id=user_id,
+                    voice=audio_file_obj,
+                    caption=reply_text,
+                    parse_mode='HTML'
+                )
+        
+        # React to the admin message to show it was sent
+        await update.message.reply_text(f"✅ تم إرسال {media_name} للمتقدم بنجاح")
+        
+        logger.info(f"Admin {media_type} sent from {update.effective_user.id} to user {user_id}")
+        
+    except Exception as e:
+        logger.error(f"Failed to send admin audio: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الملف الصوتي للمتقدم")
+
+# Enhanced user media handling
+async def handle_user_photo(update: Update, context: CallbackContext) -> None:
+    """Handle photo messages from users."""
+    user_id = update.effective_user.id
+    
+    try:
+        # Check if user has an active conversation
+        if user_id not in active_conversations or not active_conversations[user_id]['active']:
+            return
+        
+        conversation = active_conversations[user_id]
+        admin_name = conversation['admin_name']
+        
+        # Get user info
+        user_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            user_name += f" {update.effective_user.last_name}"
+        
+        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
+        
+        # Save the photo
+        photo = update.message.photo[-1]  # Get highest resolution
+        file_path = await save_media_file(photo, "photo", user_id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في إرسال الصورة")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
+        
+        # Format message to admin
+        admin_message = f"""
+💬 <b>صورة من المتقدم:</b>
+
+📷 تم إرسال صورة{caption}
+
+---
+👤 <b>من:</b> {user_name} {username_text}
+🆔 <b>معرف المستخدم:</b> {user_id}
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to admin group
+        with open(file_path, 'rb') as photo_file:
+            sent_message = await context.bot.send_photo(
+                chat_id=ADMIN_GROUP_ID,
+                photo=photo_file,
+                caption=admin_message,
+                parse_mode='HTML'
+            )
+        
+        # Store mapping for potential replies
+        admin_message_to_user[sent_message.message_id] = user_id
+        
+        # Confirm to user
+        await update.message.reply_text("✅ تم إرسال الصورة للإدارة")
+        
+        logger.info(f"User photo forwarded from {user_id} to admin group")
+        
+    except Exception as e:
+        logger.error(f"Failed to handle user photo: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الصورة")
+
+async def handle_user_video(update: Update, context: CallbackContext) -> None:
+    """Handle video messages from users."""
+    user_id = update.effective_user.id
+    
+    try:
+        # Check if user has an active conversation
+        if user_id not in active_conversations or not active_conversations[user_id]['active']:
+            return
+        
+        conversation = active_conversations[user_id]
+        admin_name = conversation['admin_name']
+        
+        # Get user info
+        user_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            user_name += f" {update.effective_user.last_name}"
+        
+        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
+        
+        # Save the video
+        video = update.message.video
+        file_path = await save_media_file(video, "video", user_id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في إرسال الفيديو")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
+        
+        # Format message to admin
+        admin_message = f"""
+💬 <b>فيديو من المتقدم:</b>
+
+🎥 تم إرسال فيديو{caption}
+
+---
+👤 <b>من:</b> {user_name} {username_text}
+🆔 <b>معرف المستخدم:</b> {user_id}
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to admin group
+        with open(file_path, 'rb') as video_file:
+            sent_message = await context.bot.send_video(
+                chat_id=ADMIN_GROUP_ID,
+                video=video_file,
+                caption=admin_message,
+                parse_mode='HTML'
+            )
+        
+        # Store mapping for potential replies
+        admin_message_to_user[sent_message.message_id] = user_id
+        
+        # Confirm to user
+        await update.message.reply_text("✅ تم إرسال الفيديو للإدارة")
+        
+        logger.info(f"User video forwarded from {user_id} to admin group")
+        
+    except Exception as e:
+        logger.error(f"Failed to handle user video: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الفيديو")
+
+async def handle_user_audio(update: Update, context: CallbackContext) -> None:
+    """Handle audio/voice messages from users."""
+    user_id = update.effective_user.id
+    
+    try:
+        # Check if user has an active conversation
+        if user_id not in active_conversations or not active_conversations[user_id]['active']:
+            return
+        
+        conversation = active_conversations[user_id]
+        admin_name = conversation['admin_name']
+        
+        # Get user info
+        user_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            user_name += f" {update.effective_user.last_name}"
+        
+        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
+        
+        # Determine if it's audio or voice
+        if update.message.audio:
+            audio_file = update.message.audio
+            media_type = "audio"
+            media_emoji = "🎵"
+            media_name = "ملف صوتي"
+        elif update.message.voice:
+            audio_file = update.message.voice
+            media_type = "voice"
+            media_emoji = "🎤"
+            media_name = "رسالة صوتية"
+        else:
+            return
+        
+        # Save the audio file
+        file_path = await save_media_file(audio_file, media_type, user_id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في إرسال الملف الصوتي")
+            return
+        
+        # Prepare caption
+        caption = ""
+        if update.message.caption:
+            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
+        
+        # Format message to admin
+        admin_message = f"""
+💬 <b>{media_name} من المتقدم:</b>
+
+{media_emoji} تم إرسال {media_name}{caption}
+
+---
+👤 <b>من:</b> {user_name} {username_text}
+🆔 <b>معرف المستخدم:</b> {user_id}
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to admin group
+        with open(file_path, 'rb') as audio_file_obj:
+            if media_type == "audio":
+                sent_message = await context.bot.send_audio(
+                    chat_id=ADMIN_GROUP_ID,
+                    audio=audio_file_obj,
+                    caption=admin_message,
+                    parse_mode='HTML'
+                )
+            else:  # voice
+                sent_message = await context.bot.send_voice(
+                    chat_id=ADMIN_GROUP_ID,
+                    voice=audio_file_obj,
+                    caption=admin_message,
+                    parse_mode='HTML'
+                )
+        
+        # Store mapping for potential replies
+        admin_message_to_user[sent_message.message_id] = user_id
+        
+        # Confirm to user
+        await update.message.reply_text(f"✅ تم إرسال {media_name} للإدارة")
+        
+        logger.info(f"User {media_type} forwarded from {user_id} to admin group")
+        
+    except Exception as e:
+        logger.error(f"Failed to handle user audio: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الملف الصوتي")
+
+# Rest of the original functions remain the same...
 async def stats_command(update: Update, context: CallbackContext) -> None:
     """Handle /stats command - show application statistics (admin only)."""
     try:
@@ -591,7 +1093,7 @@ async def cancel_command(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
 
 async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
-    """Handle admin replies to application notifications."""
+    """Handle admin text replies to application notifications."""
     try:
         # Check if message is from admin group
         if update.effective_chat.id != ADMIN_GROUP_ID:
@@ -634,6 +1136,7 @@ async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
 📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
+📷 <b>يمكنك أيضاً إرسال صور وفيديوهات ورسائل صوتية!</b>
 """
         
         # Send reply to the original user
@@ -738,7 +1241,7 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
         await query.answer("حدث خطأ في معالجة القرار", show_alert=True)
 
 async def handle_user_reply(update: Update, context: CallbackContext) -> None:
-    """Handle user replies in active conversations."""
+    """Handle user text replies in active conversations."""
     user_id = update.effective_user.id
     
     try:
@@ -856,3 +1359,4 @@ async def handle_unknown_message(update: Update, context: CallbackContext) -> No
     except Exception as e:
         logger.error(f"Error in handle_unknown_message: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
+
