@@ -39,7 +39,7 @@ from handlers import (
     ASKING_WHATSAPP,
     ASKING_BROADCAST_MESSAGE
 )
-from config_enhanced import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
+from config import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
 
 # Configure logging
 logging.basicConfig(
