@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
-from config_enhanced import *
+from config import *
 from data_manager import DataManager
 
 logger = logging.getLogger(__name__)
