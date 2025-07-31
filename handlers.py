@@ -428,10 +428,11 @@ async def send_admin_notification(context: CallbackContext, application_data: di
 """
         
         # Create inline keyboard with accept/reject buttons
+        # Include team_name in callback data to preserve it
         keyboard = [
             [
-                InlineKeyboardButton("✅ قبول", callback_data=f"accept_{user_info['user_id']}_{application_data['selected_team']}"),
-                InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user_info['user_id']}_{application_data['selected_team']}")
+                InlineKeyboardButton("✅ قبول", callback_data=f"accept_{user_info['user_id']}_{application_data['selected_team']}_{application_data['team_name']}"),
+                InlineKeyboardButton("❌ رفض", callback_data=f"reject_{user_info['user_id']}_{application_data['selected_team']}_{application_data['team_name']}")
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -450,6 +451,123 @@ async def send_admin_notification(context: CallbackContext, application_data: di
         
     except Exception as e:
         logger.error(f"Failed to send admin notification: {e}")
+
+async def handle_admin_decision(update: Update, context: CallbackContext) -> None:
+    """Handle admin accept/reject button clicks."""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        # Check if message is from admin group
+        if query.message.chat.id != ADMIN_GROUP_ID:
+            await query.answer("هذا الأمر مخصص للإدارة فقط", show_alert=True)
+            return
+        
+        # Parse callback data
+        callback_data = query.data
+        if not (callback_data.startswith("accept_") or callback_data.startswith("reject_")):
+            return
+        
+        parts = callback_data.split("_")
+        decision = parts[0]  # "accept" or "reject"
+        user_id = int(parts[1])
+        team_id = parts[2]
+        
+        # Get team name from callback data if available (new format)
+        if len(parts) > 3:
+            team_name = parts[3]
+        else:
+            # Fallback to old method for backward compatibility
+            team_name = TEAMS.get(team_id, None)
+            
+            # If not found in TEAMS, search in applications data
+            if not team_name or team_name == "غير معروف":
+                user_applications = data_manager.get_user_applications(user_id)
+                for app in user_applications:
+                    if app.get('selected_team') == team_id:
+                        team_name = app.get('team_name', 'غير معروف')
+                        break
+                
+                # If still not found, search in all applications
+                if not team_name or team_name == "غير معروف":
+                    all_applications = data_manager.applications
+                    for app in all_applications:
+                        if (app.get('user_info', {}).get('user_id') == user_id and 
+                            app.get('selected_team') == team_id):
+                            team_name = app.get('team_name', 'غير معروف')
+                            break
+            
+            # If still not found, use a fallback based on team_id
+            if not team_name or team_name == "غير معروف":
+                team_name_map = {
+                    "team_exams": "تيم الاختبارات",
+                    "team_collections": "تيم التجميعات", 
+                    "team_support": "تيم الدعم الفني"
+                }
+                team_name = team_name_map.get(team_id, f"التيم ({team_id})")
+        
+        # Get admin info
+        admin_name = query.from_user.first_name
+        if query.from_user.last_name:
+            admin_name += f" {query.from_user.last_name}"
+        
+        # Prepare message based on decision
+        if decision == "accept":
+            user_message = f"""
+🎉 <b>تهانينا! تم قبول طلبك</b>
+
+مرحباً بك في {team_name}! 🎯
+
+تم قبول طلبك للانضمام لفريقنا. نحن متحمسون لوجودك معنا!
+
+سيتم التواصل معك قريباً من قبل مسؤول الفريق لإعطائك التفاصيل والخطوات التالية.
+
+نتطلع للعمل معك! 🤝
+
+---
+✅ <b>تم الموافقة بواسطة:</b> {admin_name}
+📅 <b>تاريخ القبول:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+            admin_confirmation = f"✅ تم قبول المتقدم في {team_name} وإرسال رسالة التهنئة"
+        else:
+            user_message = f"""
+📝 <b>شكراً لك على اهتمامك</b>
+
+نشكرك على تقديمك للانضمام لـ {team_name}.
+
+للأسف، لم نتمكن من قبول طلبك في الوقت الحالي. هذا لا يعني أن طلبك لم يكن جيداً، لكن لدينا عدد محدود من الأماكن المتاحة.
+
+نشجعك على المحاولة مرة أخرى في المستقبل أو التقديم لفريق آخر.
+
+شكراً لك مرة أخرى!
+
+---
+❌ <b>تم الرفض بواسطة:</b> {admin_name}
+📅 <b>تاريخ الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+            admin_confirmation = f"❌ تم رفض المتقدم من {team_name} وإرسال رسالة مهذبة"
+        
+        # Send message to user
+        await context.bot.send_message(
+            chat_id=user_id,
+            text=user_message,
+            parse_mode='HTML'
+        )
+        
+        # Update admin message to show decision was made
+        original_text = query.message.text
+        updated_text = f"{original_text}\n\n{admin_confirmation}"
+        
+        await query.edit_message_text(
+            text=updated_text,
+            parse_mode='HTML'
+        )
+        
+        logger.info(f"Admin decision: {decision} for user {user_id} in team {team_name} by {query.from_user.id}")
+        
+    except Exception as e:
+        logger.error(f"Failed to handle admin decision: {e}")
+        await query.answer("حدث خطأ في معالجة القرار", show_alert=True)
 
 # Enhanced media handling functions
 async def save_media_file(file, media_type: str, user_id: int) -> str:
@@ -1176,17 +1294,34 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
         user_id = int(parts[1])
         team_id = parts[2]
         
-        # احصل على اسم الفريق من TEAMS dictionary
-        team_name = TEAMS.get(team_id, "غير معروف")
+        # First try to get team name from TEAMS dictionary
+        team_name = TEAMS.get(team_id, None)
         
-        # إذا كان الاسم لا يزال "غير معروف"، ابحث في applications
-        if team_name == "غير معروف":
-            # ابحث عن التطبيق في البيانات للحصول على اسم الفريق
+        # If not found in TEAMS, search in applications data
+        if not team_name or team_name == "غير معروف":
             user_applications = data_manager.get_user_applications(user_id)
             for app in user_applications:
-                if app['selected_team'] == team_id:
-                    team_name = app['team_name']
+                if app.get('selected_team') == team_id:
+                    team_name = app.get('team_name', 'غير معروف')
                     break
+            
+            # If still not found, search in all applications
+            if not team_name or team_name == "غير معروف":
+                all_applications = data_manager.applications
+                for app in all_applications:
+                    if (app.get('user_info', {}).get('user_id') == user_id and 
+                        app.get('selected_team') == team_id):
+                        team_name = app.get('team_name', 'غير معروف')
+                        break
+        
+        # If still not found, use a fallback based on team_id
+        if not team_name or team_name == "غير معروف":
+            team_name_map = {
+                "team_exams": "تيم الاختبارات",
+                "team_collections": "تيم التجميعات", 
+                "team_support": "تيم الدعم الفني"
+            }
+            team_name = team_name_map.get(team_id, f"التيم ({team_id})")
         
         # Get admin info
         admin_name = query.from_user.first_name
@@ -1250,7 +1385,6 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
     except Exception as e:
         logger.error(f"Failed to handle admin decision: {e}")
         await query.answer("حدث خطأ في معالجة القرار", show_alert=True)
-
 async def handle_user_reply(update: Update, context: CallbackContext) -> None:
     """Handle user text replies in active conversations."""
     user_id = update.effective_user.id
