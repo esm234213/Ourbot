@@ -21,7 +21,7 @@ ASKING_WHATSAPP = 4
 TEAMS = {
     "team_exams": "تيم الاختبارات",
     "team_collections": "تيم التجميعات", 
-    "team_support": "تيم الدعم الفني"
+    "team_support": "تيم السوشيال"
 }
 
 # Data files
