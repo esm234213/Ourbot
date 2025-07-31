@@ -1175,7 +1175,18 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
         decision = parts[0]  # "accept" or "reject"
         user_id = int(parts[1])
         team_id = parts[2]
+        
+        # احصل على اسم الفريق من TEAMS dictionary
         team_name = TEAMS.get(team_id, "غير معروف")
+        
+        # إذا كان الاسم لا يزال "غير معروف"، ابحث في applications
+        if team_name == "غير معروف":
+            # ابحث عن التطبيق في البيانات للحصول على اسم الفريق
+            user_applications = data_manager.get_user_applications(user_id)
+            for app in user_applications:
+                if app['selected_team'] == team_id:
+                    team_name = app['team_name']
+                    break
         
         # Get admin info
         admin_name = query.from_user.first_name
@@ -1199,7 +1210,7 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
 ✅ <b>تم الموافقة بواسطة:</b> {admin_name}
 📅 <b>تاريخ القبول:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
-            admin_confirmation = f"✅ تم قبول المتقدم وإرسال رسالة التهنئة"
+            admin_confirmation = f"✅ تم قبول المتقدم في {team_name} وإرسال رسالة التهنئة"
         else:
             user_message = f"""
 📝 <b>شكراً لك على اهتمامك</b>
@@ -1210,13 +1221,13 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
 
 نشجعك على المحاولة مرة أخرى في المستقبل أو التقديم لفريق آخر.
 
-شكراً لك مرة أخرى! 🙏
+شكراً لك مرة أخرى!
 
 ---
 ❌ <b>تم الرفض بواسطة:</b> {admin_name}
 📅 <b>تاريخ الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
-            admin_confirmation = f"❌ تم رفض المتقدم وإرسال رسالة مهذبة"
+            admin_confirmation = f"❌ تم رفض المتقدم من {team_name} وإرسال رسالة مهذبة"
         
         # Send message to user
         await context.bot.send_message(
@@ -1234,7 +1245,7 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
             parse_mode='HTML'
         )
         
-        logger.info(f"Admin decision: {decision} for user {user_id} by {query.from_user.id}")
+        logger.info(f"Admin decision: {decision} for user {user_id} in team {team_name} by {query.from_user.id}")
         
     except Exception as e:
         logger.error(f"Failed to handle admin decision: {e}")
