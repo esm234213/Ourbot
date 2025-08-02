@@ -453,48 +453,366 @@ async def send_admin_notification(context: CallbackContext, application_data: di
         sent_message = await context.bot.send_message(
             chat_id=ADMIN_GROUP_ID,
             text=notification_text,
-            parse_mode='HTML',
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            parse_mode='HTML'
         )
         
-        # Store mapping for reply handling
+        # Store mapping for admin replies
         admin_message_to_user[sent_message.message_id] = user_info['user_id']
         
-        logger.info(f"Admin notification sent for application {application_data.get('id', 'unknown')}")
+        logger.info(f"Admin notification sent for user {user_info['user_id']}")
         
     except Exception as e:
         logger.error(f"Failed to send admin notification: {e}")
 
-async def handle_admin_decision(update: Update, context: CallbackContext) -> None:
-    """Handle admin accept/reject button clicks."""
+async def stats_command(update: Update, context: CallbackContext) -> None:
+    """Handle /stats command - show application statistics (admin only)."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            await update.message.reply_text(NO_STATS_PERMISSION)
+            return
+        
+        stats = data_manager.get_stats()
+        
+        if stats['total_applications'] == 0:
+            await update.message.reply_text(NO_APPLICATIONS_YET)
+            return
+        
+        stats_text = STATS_HEADER.format(
+            total_applications=stats['total_applications'],
+            total_users=stats['total_users']
+        )
+        
+        # Add team breakdown
+        for team_id, count in stats['teams'].items():
+            team_name = TEAMS.get(team_id, team_id)
+            percentage = (count / stats['total_applications'] * 100) if stats['total_applications'] > 0 else 0
+            stats_text += f"• {team_name}: {count} طلب ({percentage:.1f}%)\n"
+        
+        await update.message.reply_text(stats_text, parse_mode='HTML')
+        
+    except Exception as e:
+        logger.error(f"Error in stats_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+
+async def broadcast_command(update: Update, context: CallbackContext) -> int:
+    """Handle /broadcast command - send message to all users (admin only)."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
+            return ConversationHandler.END
+        
+        # Ask for broadcast type
+        keyboard = [
+            [
+                InlineKeyboardButton("📝 نص فقط", callback_data="broadcast_text"),
+                InlineKeyboardButton("🖼️ صورة مع نص", callback_data="broadcast_image")
+            ],
+            [InlineKeyboardButton("❌ إلغاء", callback_data="broadcast_cancel")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(
+            "📢 <b>اختر نوع الرسالة الإذاعية:</b>",
+            reply_markup=reply_markup,
+            parse_mode='HTML'
+        )
+        return ASKING_BROADCAST_TYPE
+        
+    except Exception as e:
+        logger.error(f"Error in broadcast_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+        return ConversationHandler.END
+
+async def handle_broadcast_type(update: Update, context: CallbackContext) -> int:
+    """Handle broadcast type selection."""
     query = update.callback_query
     await query.answer()
     
     try:
-        # Check if message is from admin group
-        if query.message.chat.id != ADMIN_GROUP_ID:
-            await query.answer("هذا الأمر مخصص للإدارة فقط", show_alert=True)
-            return
+        if query.data == "broadcast_cancel":
+            await query.edit_message_text("❌ تم إلغاء الإرسال الإذاعي.")
+            return ConversationHandler.END
         
-        # Parse callback data
-        callback_data = query.data
-        if not (callback_data.startswith("accept_") or callback_data.startswith("reject_")):
-            return
+        elif query.data == "broadcast_text":
+            context.user_data['broadcast_type'] = 'text'
+            await query.edit_message_text(BROADCAST_PROMPT, parse_mode='HTML')
+            return ASKING_BROADCAST_MESSAGE
         
-        parts = callback_data.split("_")
-        decision = parts[0]  # "accept" or "reject"
-        user_id = int(parts[1])
-        team_id = parts[2]
+        elif query.data == "broadcast_image":
+            context.user_data['broadcast_type'] = 'image'
+            await query.edit_message_text(
+                "🖼️ <b>أرسل الصورة التي تريد إرسالها في الرسالة الإذاعية:</b>\n\n"
+                "💡 يمكنك إضافة نص مع الصورة كتعليق (caption)",
+                parse_mode='HTML'
+            )
+            return ASKING_BROADCAST_IMAGE
         
-        # Get team name from callback data if available (new format)
-        if len(parts) > 3:
-            team_name = parts[3]
+    except Exception as e:
+        logger.error(f"Error in handle_broadcast_type: {e}")
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+        return ConversationHandler.END
+
+async def handle_broadcast_message(update: Update, context: CallbackContext) -> int:
+    """Handle broadcast text message input with improved error handling."""
+    try:
+        broadcast_text = update.message.text.strip()
+        
+        if len(broadcast_text) < 5:
+            await update.message.reply_text("⚠️ الرسالة قصيرة جداً. يرجى كتابة رسالة أطول.")
+            return ASKING_BROADCAST_MESSAGE
+        
+        # Get all users
+        all_users = data_manager.get_all_users()
+        
+        if not all_users:
+            await update.message.reply_text("❌ لا يوجد مستخدمين لإرسال الرسالة إليهم.")
+            return ConversationHandler.END
+        
+        # Send broadcast message with improved error handling
+        sent_count = 0
+        failed_count = 0
+        
+        # Add header to broadcast message
+        formatted_message = f"""
+📢 <b>رسالة من فريق Our Goal</b>
+
+{broadcast_text}
+
+---
+📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to all users with individual error handling
+        for user_id in all_users:
+            try:
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text=formatted_message,
+                    parse_mode='HTML'
+                )
+                sent_count += 1
+                logger.info(f"Broadcast message sent successfully to user {user_id}")
+            except Exception as e:
+                failed_count += 1
+                logger.warning(f"Failed to send broadcast message to user {user_id}: {e}")
+                # Continue to next user instead of stopping
+                continue
+        
+        # Send confirmation to admin
+        confirmation_text = f"""
+✅ <b>تم إرسال الرسالة الإذاعية بنجاح!</b>
+
+📊 <b>الإحصائيات:</b>
+• تم الإرسال بنجاح: {sent_count} مستخدم
+• فشل الإرسال: {failed_count} مستخدم
+• إجمالي المحاولات: {sent_count + failed_count}
+
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+📝 <b>نوع الرسالة:</b> نص فقط
+"""
+        
+        await update.message.reply_text(confirmation_text, parse_mode='HTML')
+        
+        context.user_data.clear()
+        
+        logger.info(f"Broadcast message sent to {sent_count} users, failed for {failed_count} users")
+        return ConversationHandler.END
+        
+    except Exception as e:
+        logger.error(f"Error in handle_broadcast_message: {e}")
+        await update.message.reply_text(
+            "❌ حدث خطأ أثناء إرسال الرسالة الإذاعية. يرجى المحاولة مرة أخرى أو التواصل مع المطور."
+        )
+        return ConversationHandler.END
+
+async def handle_broadcast_image(update: Update, context: CallbackContext) -> int:
+    """Handle broadcast image input with improved error handling."""
+    try:
+        if not update.message.photo:
+            await update.message.reply_text(
+                "⚠️ يرجى إرسال صورة صالحة.\n\n"
+                "💡 يمكنك إضافة نص مع الصورة كتعليق"
+            )
+            return ASKING_BROADCAST_IMAGE
+        
+        # Save the image
+        photo = update.message.photo[-1]  # Get highest resolution
+        file_path = await save_media_file(photo, "photo", update.effective_user.id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في حفظ الصورة. يرجى المحاولة مرة أخرى.")
+            return ASKING_BROADCAST_IMAGE
+        
+        # Store image info
+        context.user_data['broadcast_image_path'] = file_path
+        context.user_data['broadcast_caption'] = update.message.caption or ""
+        
+        # Get all users
+        all_users = data_manager.get_all_users()
+        
+        if not all_users:
+            await update.message.reply_text("❌ لا يوجد مستخدمين لإرسال الرسالة إليهم.")
+            return ConversationHandler.END
+        
+        # Send broadcast image with improved error handling
+        sent_count = 0
+        failed_count = 0
+        
+        # Prepare caption
+        caption = context.user_data['broadcast_caption']
+        if caption:
+            formatted_caption = f"""
+📢 <b>رسالة من فريق Our Goal</b>
+
+{caption}
+
+---
+📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
         else:
-            # Fallback to old method for backward compatibility
-            team_name = TEAMS.get(team_id, None)
+            formatted_caption = f"""
+📢 <b>رسالة من فريق Our Goal</b>
+
+---
+📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to all users with individual error handling
+        for user_id in all_users:
+            try:
+                with open(file_path, 'rb') as photo_file:
+                    await context.bot.send_photo(
+                        chat_id=user_id,
+                        photo=photo_file,
+                        caption=formatted_caption,
+                        parse_mode='HTML'
+                    )
+                sent_count += 1
+                logger.info(f"Broadcast image sent successfully to user {user_id}")
+            except Exception as e:
+                failed_count += 1
+                logger.warning(f"Failed to send broadcast image to user {user_id}: {e}")
+                # Continue to next user instead of stopping
+                continue
+        
+        # Send confirmation to admin
+        confirmation_text = f"""
+✅ <b>تم إرسال الرسالة الإذاعية بالصورة بنجاح!</b>
+
+📊 <b>الإحصائيات:</b>
+• تم الإرسال بنجاح: {sent_count} مستخدم
+• فشل الإرسال: {failed_count} مستخدم
+• إجمالي المحاولات: {sent_count + failed_count}
+
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+🖼️ <b>نوع الرسالة:</b> صورة مع نص
+"""
+        
+        await update.message.reply_text(confirmation_text, parse_mode='HTML')
+        
+        # Clean up
+        try:
+            os.remove(file_path)
+        except:
+            pass
+        
+        context.user_data.clear()
+        
+        logger.info(f"Broadcast image sent to {sent_count} users, failed for {failed_count} users")
+        return ConversationHandler.END
+        
+    except Exception as e:
+        logger.error(f"Error in handle_broadcast_image: {e}")
+        await update.message.reply_text(
+            "❌ حدث خطأ أثناء إرسال الرسالة الإذاعية بالصورة. يرجى المحاولة مرة أخرى أو التواصل مع المطور."
+        )
+        return ConversationHandler.END
+
+# Enhanced media handling functions
+async def save_media_file(file, media_type: str, user_id: int) -> str:
+    """Save media file and return the file path."""
+    try:
+        # Get file info
+        file_info = await file.get_file()
+        
+        # Determine file extension
+        file_extension = os.path.splitext(file_info.file_path)[1]
+        if not file_extension:
+            if media_type == "photo":
+                file_extension = ".jpg"
+            elif media_type == "video":
+                file_extension = ".mp4"
+            elif media_type == "audio":
+                file_extension = ".ogg"
+            elif media_type == "voice":
+                file_extension = ".ogg"
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{user_id}_{timestamp}{file_extension}"
+        
+        # Determine directory based on media type
+        if media_type == "photo":
+            directory = IMAGES_DIR
+        elif media_type == "video":
+            directory = VIDEOS_DIR
+        elif media_type in ["audio", "voice"]:
+            directory = AUDIO_DIR
+        else:
+            directory = MEDIA_DIR
+        
+        # Full file path
+        file_path = os.path.join(directory, filename)
+        
+        # Download and save file
+        await file_info.download_to_drive(file_path)
+        
+        logger.info(f"Media file saved: {file_path}")
+        return file_path
+        
+    except Exception as e:
+        logger.error(f"Failed to save media file: {e}")
+        return None
+
+async def cancel_command(update: Update, context: CallbackContext) -> int:
+    """Handle /cancel command - cancel current conversation."""
+    try:
+        await update.message.reply_text(CANCEL_MESSAGE)
+        context.user_data.clear()
+        return ConversationHandler.END
+        
+    except Exception as e:
+        logger.error(f"Error in cancel_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+        return ConversationHandler.END
+
+async def handle_admin_decision(update: Update, context: CallbackContext) -> None:
+    """Handle admin decision buttons (accept/reject)."""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        # Parse callback data: accept_user_id_team_id_team_name or reject_user_id_team_id_team_name
+        callback_parts = query.data.split("_", 3)  # Split into max 4 parts
+        decision = callback_parts[0]  # accept or reject
+        user_id = int(callback_parts[1])
+        team_id = callback_parts[2]
+        
+        # Extract team_name (might contain underscores)
+        team_name = "غير معروف"
+        if len(callback_parts) > 3:
+            team_name = callback_parts[3]
+        else:
+            # Fallback: try to get team name from TEAMS dict or user applications
+            team_name = TEAMS.get(team_id, "غير معروف")
             
-            # If not found in TEAMS, search in applications data
-            if not team_name or team_name == "غير معروف":
+            # If still not found, search in user applications
+            if team_name == "غير معروف":
                 user_applications = data_manager.get_user_applications(user_id)
                 for app in user_applications:
                     if app.get('selected_team') == team_id:
@@ -582,800 +900,87 @@ async def handle_admin_decision(update: Update, context: CallbackContext) -> Non
         logger.error(f"Failed to handle admin decision: {e}")
         await query.answer("حدث خطأ في معالجة القرار", show_alert=True)
 
-# Enhanced media handling functions
-async def save_media_file(file, media_type: str, user_id: int) -> str:
-    """Save media file and return the file path."""
-    try:
-        # Get file info
-        file_info = await file.get_file()
-        
-        # Determine file extension
-        file_extension = os.path.splitext(file_info.file_path)[1]
-        if not file_extension:
-            if media_type == "photo":
-                file_extension = ".jpg"
-            elif media_type == "video":
-                file_extension = ".mp4"
-            elif media_type == "audio":
-                file_extension = ".ogg"
-            elif media_type == "voice":
-                file_extension = ".ogg"
-        
-        # Create filename with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{user_id}_{timestamp}{file_extension}"
-        
-        # Determine directory based on media type
-        if media_type == "photo":
-            directory = IMAGES_DIR
-        elif media_type == "video":
-            directory = VIDEOS_DIR
-        elif media_type in ["audio", "voice"]:
-            directory = AUDIO_DIR
-        else:
-            directory = MEDIA_DIR
-        
-        # Full file path
-        file_path = os.path.join(directory, filename)
-        
-        # Download and save file
-        await file_info.download_to_drive(file_path)
-        
-        logger.info(f"Media file saved: {file_path}")
-        return file_path
-        
-    except Exception as e:
-        logger.error(f"Failed to save media file: {e}")
-        return None
-
-async def handle_admin_photo(update: Update, context: CallbackContext) -> None:
-    """Handle photo messages from admin."""
-    try:
-        # Check if message is from admin group
-        if update.effective_chat.id != ADMIN_GROUP_ID:
-            return
-        
-        # Check if this is a reply to a bot message
-        if not update.message.reply_to_message:
-            return
-        
-        replied_message_id = update.message.reply_to_message.message_id
-        
-        # Check if we have a mapping for this message
-        if replied_message_id not in admin_message_to_user:
-            return
-        
-        # Get the original user ID
-        user_id = admin_message_to_user[replied_message_id]
-        
-        # Get admin info
-        admin_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            admin_name += f" {update.effective_user.last_name}"
-        
-        # Save the photo
-        photo = update.message.photo[-1]  # Get highest resolution
-        file_path = await save_media_file(photo, "photo", update.effective_user.id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في حفظ الصورة")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n{update.message.caption}"
-        
-        reply_text = f"""
-📩 <b>رد من فريق Our Goal:</b>
-
-📷 تم إرسال صورة{caption}
-
----
-📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
-"""
-        
-        # Send photo to the original user
-        with open(file_path, 'rb') as photo_file:
-            await context.bot.send_photo(
-                chat_id=user_id,
-                photo=photo_file,
-                caption=reply_text,
-                parse_mode='HTML'
-            )
-        
-        # React to the admin message to show it was sent
-        await update.message.reply_text("✅ تم إرسال الصورة للمتقدم بنجاح")
-        
-        logger.info(f"Admin photo sent from {update.effective_user.id} to user {user_id}")
-        
-    except Exception as e:
-        logger.error(f"Failed to send admin photo: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الصورة للمتقدم")
-
-async def handle_admin_video(update: Update, context: CallbackContext) -> None:
-    """Handle video messages from admin."""
-    try:
-        # Check if message is from admin group
-        if update.effective_chat.id != ADMIN_GROUP_ID:
-            return
-        
-        # Check if this is a reply to a bot message
-        if not update.message.reply_to_message:
-            return
-        
-        replied_message_id = update.message.reply_to_message.message_id
-        
-        # Check if we have a mapping for this message
-        if replied_message_id not in admin_message_to_user:
-            return
-        
-        # Get the original user ID
-        user_id = admin_message_to_user[replied_message_id]
-        
-        # Get admin info
-        admin_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            admin_name += f" {update.effective_user.last_name}"
-        
-        # Save the video
-        video = update.message.video
-        file_path = await save_media_file(video, "video", update.effective_user.id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في حفظ الفيديو")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n{update.message.caption}"
-        
-        reply_text = f"""
-📩 <b>رد من فريق Our Goal:</b>
-
-🎥 تم إرسال فيديو{caption}
-
----
-📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
-"""
-        
-        # Send video to the original user
-        with open(file_path, 'rb') as video_file:
-            await context.bot.send_video(
-                chat_id=user_id,
-                video=video_file,
-                caption=reply_text,
-                parse_mode='HTML'
-            )
-        
-        # React to the admin message to show it was sent
-        await update.message.reply_text("✅ تم إرسال الفيديو للمتقدم بنجاح")
-        
-        logger.info(f"Admin video sent from {update.effective_user.id} to user {user_id}")
-        
-    except Exception as e:
-        logger.error(f"Failed to send admin video: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الفيديو للمتقدم")
-
-async def handle_admin_audio(update: Update, context: CallbackContext) -> None:
-    """Handle audio/voice messages from admin."""
-    try:
-        # Check if message is from admin group
-        if update.effective_chat.id != ADMIN_GROUP_ID:
-            return
-        
-        # Check if this is a reply to a bot message
-        if not update.message.reply_to_message:
-            return
-        
-        replied_message_id = update.message.reply_to_message.message_id
-        
-        # Check if we have a mapping for this message
-        if replied_message_id not in admin_message_to_user:
-            return
-        
-        # Get the original user ID
-        user_id = admin_message_to_user[replied_message_id]
-        
-        # Get admin info
-        admin_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            admin_name += f" {update.effective_user.last_name}"
-        
-        # Determine if it's audio or voice
-        if update.message.audio:
-            audio_file = update.message.audio
-            media_type = "audio"
-            media_emoji = "🎵"
-            media_name = "ملف صوتي"
-        elif update.message.voice:
-            audio_file = update.message.voice
-            media_type = "voice"
-            media_emoji = "🎤"
-            media_name = "رسالة صوتية"
-        else:
-            return
-        
-        # Save the audio file
-        file_path = await save_media_file(audio_file, media_type, update.effective_user.id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في حفظ الملف الصوتي")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n{update.message.caption}"
-        
-        reply_text = f"""
-📩 <b>رد من فريق Our Goal:</b>
-
-{media_emoji} تم إرسال {media_name}{caption}
-
----
-📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
-"""
-        
-        # Send audio to the original user
-        with open(file_path, 'rb') as audio_file_obj:
-            if media_type == "audio":
-                await context.bot.send_audio(
-                    chat_id=user_id,
-                    audio=audio_file_obj,
-                    caption=reply_text,
-                    parse_mode='HTML'
-                )
-            else:  # voice
-                await context.bot.send_voice(
-                    chat_id=user_id,
-                    voice=audio_file_obj,
-                    caption=reply_text,
-                    parse_mode='HTML'
-                )
-        
-        # React to the admin message to show it was sent
-        await update.message.reply_text(f"✅ تم إرسال {media_name} للمتقدم بنجاح")
-        
-        logger.info(f"Admin {media_type} sent from {update.effective_user.id} to user {user_id}")
-        
-    except Exception as e:
-        logger.error(f"Failed to send admin audio: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الملف الصوتي للمتقدم")
-
-# Enhanced user media handling
-async def handle_user_photo(update: Update, context: CallbackContext) -> None:
-    """Handle photo messages from users."""
-    user_id = update.effective_user.id
-    
-    try:
-        # Check if user has an active conversation
-        if user_id not in active_conversations or not active_conversations[user_id]['active']:
-            return
-        
-        conversation = active_conversations[user_id]
-        admin_name = conversation['admin_name']
-        
-        # Get user info
-        user_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            user_name += f" {update.effective_user.last_name}"
-        
-        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
-        
-        # Save the photo
-        photo = update.message.photo[-1]  # Get highest resolution
-        file_path = await save_media_file(photo, "photo", user_id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في إرسال الصورة")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
-        
-        # Format message to admin
-        admin_message = f"""
-💬 <b>صورة من المتقدم:</b>
-
-📷 تم إرسال صورة{caption}
-
----
-👤 <b>من:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_id}
-📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to admin group
-        with open(file_path, 'rb') as photo_file:
-            sent_message = await context.bot.send_photo(
-                chat_id=ADMIN_GROUP_ID,
-                photo=photo_file,
-                caption=admin_message,
-                parse_mode='HTML'
-            )
-        
-        # Store mapping for potential replies
-        admin_message_to_user[sent_message.message_id] = user_id
-        
-        # Confirm to user
-        await update.message.reply_text("✅ تم إرسال الصورة للإدارة")
-        
-        logger.info(f"User photo forwarded from {user_id} to admin group")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle user photo: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الصورة")
-
-async def handle_user_video(update: Update, context: CallbackContext) -> None:
-    """Handle video messages from users."""
-    user_id = update.effective_user.id
-    
-    try:
-        # Check if user has an active conversation
-        if user_id not in active_conversations or not active_conversations[user_id]['active']:
-            return
-        
-        conversation = active_conversations[user_id]
-        admin_name = conversation['admin_name']
-        
-        # Get user info
-        user_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            user_name += f" {update.effective_user.last_name}"
-        
-        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
-        
-        # Save the video
-        video = update.message.video
-        file_path = await save_media_file(video, "video", user_id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في إرسال الفيديو")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
-        
-        # Format message to admin
-        admin_message = f"""
-💬 <b>فيديو من المتقدم:</b>
-
-🎥 تم إرسال فيديو{caption}
-
----
-👤 <b>من:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_id}
-📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to admin group
-        with open(file_path, 'rb') as video_file:
-            sent_message = await context.bot.send_video(
-                chat_id=ADMIN_GROUP_ID,
-                video=video_file,
-                caption=admin_message,
-                parse_mode='HTML'
-            )
-        
-        # Store mapping for potential replies
-        admin_message_to_user[sent_message.message_id] = user_id
-        
-        # Confirm to user
-        await update.message.reply_text("✅ تم إرسال الفيديو للإدارة")
-        
-        logger.info(f"User video forwarded from {user_id} to admin group")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle user video: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الفيديو")
-
-async def handle_user_audio(update: Update, context: CallbackContext) -> None:
-    """Handle audio/voice messages from users."""
-    user_id = update.effective_user.id
-    
-    try:
-        # Check if user has an active conversation
-        if user_id not in active_conversations or not active_conversations[user_id]['active']:
-            return
-        
-        conversation = active_conversations[user_id]
-        admin_name = conversation['admin_name']
-        
-        # Get user info
-        user_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            user_name += f" {update.effective_user.last_name}"
-        
-        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
-        
-        # Determine if it's audio or voice
-        if update.message.audio:
-            audio_file = update.message.audio
-            media_type = "audio"
-            media_emoji = "🎵"
-            media_name = "ملف صوتي"
-        elif update.message.voice:
-            audio_file = update.message.voice
-            media_type = "voice"
-            media_emoji = "🎤"
-            media_name = "رسالة صوتية"
-        else:
-            return
-        
-        # Save the audio file
-        file_path = await save_media_file(audio_file, media_type, user_id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في إرسال الملف الصوتي")
-            return
-        
-        # Prepare caption
-        caption = ""
-        if update.message.caption:
-            caption = f"\n\n📝 <b>تعليق:</b> {update.message.caption}"
-        
-        # Format message to admin
-        admin_message = f"""
-💬 <b>{media_name} من المتقدم:</b>
-
-{media_emoji} تم إرسال {media_name}{caption}
-
----
-👤 <b>من:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_id}
-📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to admin group
-        with open(file_path, 'rb') as audio_file_obj:
-            if media_type == "audio":
-                sent_message = await context.bot.send_audio(
-                    chat_id=ADMIN_GROUP_ID,
-                    audio=audio_file_obj,
-                    caption=admin_message,
-                    parse_mode='HTML'
-                )
-            else:  # voice
-                sent_message = await context.bot.send_voice(
-                    chat_id=ADMIN_GROUP_ID,
-                    voice=audio_file_obj,
-                    caption=admin_message,
-                    parse_mode='HTML'
-                )
-        
-        # Store mapping for potential replies
-        admin_message_to_user[sent_message.message_id] = user_id
-        
-        # Confirm to user
-        await update.message.reply_text(f"✅ تم إرسال {media_name} للإدارة")
-        
-        logger.info(f"User {media_type} forwarded from {user_id} to admin group")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle user audio: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الملف الصوتي")
-
-# Statistics and admin functions
-async def stats_command(update: Update, context: CallbackContext) -> None:
-    """Handle /stats command - show application statistics (admin only)."""
-    try:
-        # Check if message is from admin group
-        if update.effective_chat.id != ADMIN_GROUP_ID:
-            await update.message.reply_text(NO_STATS_PERMISSION)
-            return
-        
-        # Get statistics
-        stats = data_manager.get_statistics()
-        
-        if stats['total_applications'] == 0:
-            await update.message.reply_text(NO_APPLICATIONS_YET)
-            return
-        
-        # Format statistics message
-        stats_text = f"""
-📊 <b>إحصائيات طلبات التقديم</b>
-
-📈 <b>الإحصائيات العامة:</b>
-• إجمالي الطلبات: {stats['total_applications']}
-• عدد المتقدمين: {stats['total_users']}
-• الطلبات الأخيرة (7 أيام): {stats['recent_applications']}
-• المستخدمين النشطين: {stats['active_users']}
-
-🎯 <b>التفاصيل حسب التيم:</b>
-"""
-        
-        for team_id, team_name in TEAMS.items():
-            count = stats['team_counts'].get(team_id, 0)
-            percentage = (count / stats['total_applications'] * 100) if stats['total_applications'] > 0 else 0
-            stats_text += f"• {team_name}: {count} طلب ({percentage:.1f}%)\n"
-        
-        await update.message.reply_text(stats_text, parse_mode='HTML')
-        
-    except Exception as e:
-        logger.error(f"Error in stats_command: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-
-async def broadcast_command(update: Update, context: CallbackContext) -> int:
-    """Handle /broadcast command - send message to all users (admin only)."""
-    try:
-        # Check if message is from admin group
-        if update.effective_chat.id != ADMIN_GROUP_ID:
-            await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
-            return ConversationHandler.END
-        
-        # Ask for broadcast type
-        keyboard = [
-            [
-                InlineKeyboardButton("📝 نص فقط", callback_data="broadcast_text"),
-                InlineKeyboardButton("🖼️ صورة مع نص", callback_data="broadcast_image")
-            ],
-            [InlineKeyboardButton("❌ إلغاء", callback_data="broadcast_cancel")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await update.message.reply_text(
-            "📢 <b>اختر نوع الرسالة الإذاعية:</b>",
-            reply_markup=reply_markup,
-            parse_mode='HTML'
-        )
-        return ASKING_BROADCAST_TYPE
-        
-    except Exception as e:
-        logger.error(f"Error in broadcast_command: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-        return ConversationHandler.END
-
-async def handle_broadcast_type(update: Update, context: CallbackContext) -> int:
-    """Handle broadcast type selection."""
-    query = update.callback_query
-    await query.answer()
-    
-    try:
-        if query.data == "broadcast_cancel":
-            await query.edit_message_text("❌ تم إلغاء الإرسال الإذاعي.")
-            return ConversationHandler.END
-        
-        elif query.data == "broadcast_text":
-            context.user_data['broadcast_type'] = 'text'
-            await query.edit_message_text(BROADCAST_PROMPT, parse_mode='HTML')
-            return ASKING_BROADCAST_MESSAGE
-        
-        elif query.data == "broadcast_image":
-            context.user_data['broadcast_type'] = 'image'
-            await query.edit_message_text(
-                "🖼️ <b>أرسل الصورة التي تريد إرسالها في الرسالة الإذاعية:</b>\n\n"
-                "💡 يمكنك إضافة نص مع الصورة كتعليق (caption)",
-                parse_mode='HTML'
-            )
-            return ASKING_BROADCAST_IMAGE
-        
-    except Exception as e:
-        logger.error(f"Error in handle_broadcast_type: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-        return ConversationHandler.END
-
-async def handle_broadcast_image(update: Update, context: CallbackContext) -> int:
-    """Handle broadcast image input."""
-    try:
-        if not update.message.photo:
-            await update.message.reply_text(
-                "⚠️ يرجى إرسال صورة صالحة.\n\n"
-                "💡 يمكنك إضافة نص مع الصورة كتعليق"
-            )
-            return ASKING_BROADCAST_IMAGE
-        
-        # Save the image
-        photo = update.message.photo[-1]  # Get highest resolution
-        file_path = await save_media_file(photo, "photo", update.effective_user.id)
-        
-        if not file_path:
-            await update.message.reply_text("❌ فشل في حفظ الصورة. يرجى المحاولة مرة أخرى.")
-            return ASKING_BROADCAST_IMAGE
-        
-        # Store image info
-        context.user_data['broadcast_image_path'] = file_path
-        context.user_data['broadcast_caption'] = update.message.caption or ""
-        
-        # Get all users
-        all_users = data_manager.get_all_users()
-        
-        if not all_users:
-            await update.message.reply_text("❌ لا يوجد مستخدمين لإرسال الرسالة إليهم.")
-            return ConversationHandler.END
-        
-        # Send broadcast image
-        sent_count = 0
-        failed_count = 0
-        
-        # Prepare caption
-        caption = context.user_data['broadcast_caption']
-        if caption:
-            formatted_caption = f"""
-📢 <b>رسالة من فريق Our Goal</b>
-
-{caption}
-
----
-📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        else:
-            formatted_caption = f"""
-📢 <b>رسالة من فريق Our Goal</b>
-
----
-📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to all users
-        for user_id in all_users:
-            try:
-                with open(file_path, 'rb') as photo_file:
-                    await context.bot.send_photo(
-                        chat_id=user_id,
-                        photo=photo_file,
-                        caption=formatted_caption,
-                        parse_mode='HTML'
-                    )
-                sent_count += 1
-            except Exception as e:
-                logger.warning(f"Failed to send broadcast image to user {user_id}: {e}")
-                failed_count += 1
-        
-        # Send confirmation to admin
-        confirmation_text = f"""
-✅ <b>تم إرسال الرسالة الإذاعية بالصورة بنجاح!</b>
-
-📊 <b>الإحصائيات:</b>
-• تم الإرسال بنجاح: {sent_count} مستخدم
-• فشل الإرسال: {failed_count} مستخدم
-• إجمالي المحاولات: {sent_count + failed_count}
-
-📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-🖼️ <b>نوع الرسالة:</b> صورة مع نص
-"""
-        
-        await update.message.reply_text(confirmation_text, parse_mode='HTML')
-        
-        # Clean up
-        try:
-            os.remove(file_path)
-        except:
-            pass
-        
-        context.user_data.clear()
-        
-        logger.info(f"Broadcast image sent to {sent_count} users, failed for {failed_count} users")
-        return ConversationHandler.END
-        
-    except Exception as e:
-        logger.error(f"Error in handle_broadcast_image: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-        return ConversationHandler.END
-
-async def handle_broadcast_message(update: Update, context: CallbackContext) -> int:
-    """Handle broadcast text message input."""
-    try:
-        broadcast_text = update.message.text.strip()
-        
-        if len(broadcast_text) < 5:
-            await update.message.reply_text("⚠️ الرسالة قصيرة جداً. يرجى كتابة رسالة أطول.")
-            return ASKING_BROADCAST_MESSAGE
-        
-        # Get all users
-        all_users = data_manager.get_all_users()
-        
-        if not all_users:
-            await update.message.reply_text("❌ لا يوجد مستخدمين لإرسال الرسالة إليهم.")
-            return ConversationHandler.END
-        
-        # Send broadcast message
-        sent_count = 0
-        failed_count = 0
-        
-        # Add header to broadcast message
-        formatted_message = f"""
-📢 <b>رسالة من فريق Our Goal</b>
-
-{broadcast_text}
-
----
-📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        for user_id in all_users:
-            try:
-                await context.bot.send_message(
-                    chat_id=user_id,
-                    text=formatted_message,
-                    parse_mode='HTML'
-                )
-                sent_count += 1
-            except Exception as e:
-                logger.warning(f"Failed to send broadcast to user {user_id}: {e}")
-                failed_count += 1
-        
-        # Send confirmation to admin
-        confirmation_text = f"""
-✅ <b>تم إرسال الرسالة الإذاعية بنجاح!</b>
-
-📊 <b>الإحصائيات:</b>
-• تم الإرسال بنجاح: {sent_count} مستخدم
-• فشل الإرسال: {failed_count} مستخدم
-• إجمالي المحاولات: {sent_count + failed_count}
-
-📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-📝 <b>نوع الرسالة:</b> نص فقط
-"""
-        
-        await update.message.reply_text(confirmation_text, parse_mode='HTML')
-        
-        context.user_data.clear()
-        
-        logger.info(f"Broadcast text sent to {sent_count} users, failed for {failed_count} users")
-        return ConversationHandler.END
-        
-    except Exception as e:
-        logger.error(f"Error in handle_broadcast_message: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-        return ConversationHandler.END
-
 async def clear_applications_command(update: Update, context: CallbackContext) -> None:
     """Handle /clear command - clear all applications (admin only)."""
     try:
-        # Check if user is admin
+        # Check if message is from admin group
         if update.effective_chat.id != ADMIN_GROUP_ID:
             await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
             return
         
-        # Clear applications
-        if data_manager.clear_applications():
-            await update.message.reply_text("""
-🗑️ <b>تم مسح جميع التقديمات بنجاح!</b>
-
-✅ تم مسح جميع التقديمات والبيانات
-✅ يمكن للمستخدمين الآن التقديم مرة أخرى
-✅ تم إعادة تصفير الإحصائيات
-✅ تم إنشاء نسخة احتياطية من البيانات
-
-📊 <b>للتأكد من المسح، يمكنك استخدام الأمر /stats</b>
-""", parse_mode='HTML')
-            
-            logger.info("All applications cleared by admin")
+        # Clear all applications
+        if data_manager.clear_all_applications():
+            await update.message.reply_text("✅ تم مسح جميع التقديمات بنجاح!")
+            logger.info(f"All applications cleared by admin {update.effective_user.id}")
         else:
-            await update.message.reply_text("❌ حدث خطأ أثناء مسح التقديمات")
-            
-    except Exception as e:
-        logger.error(f"Error in clear_applications_command: {e}")
-        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
-
-async def cancel_command(update: Update, context: CallbackContext) -> int:
-    """Handle /cancel command - cancel current conversation."""
-    try:
-        context.user_data.clear()
-        await update.message.reply_text(CANCEL_MESSAGE)
-        return ConversationHandler.END
+            await update.message.reply_text("❌ فشل في مسح التقديمات")
         
     except Exception as e:
-        logger.error(f"Error in cancel_command: {e}")
+        logger.error(f"Error in clear_applications_command: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
-        return ConversationHandler.END
+
+async def ban_command(update: Update, context: CallbackContext) -> None:
+    """Handle /ban command - ban a user (admin only)."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
+            return
+        
+        # Check if user ID is provided
+        if not context.args:
+            await update.message.reply_text("⚠️ يرجى تحديد معرف المستخدم\n\nمثال: /ban 123456789")
+            return
+        
+        try:
+            user_id = int(context.args[0])
+        except ValueError:
+            await update.message.reply_text("⚠️ معرف المستخدم يجب أن يكون رقماً")
+            return
+        
+        # Ban the user
+        if data_manager.ban_user(user_id):
+            await update.message.reply_text(f"✅ تم حظر المستخدم {user_id} بنجاح")
+            logger.info(f"User {user_id} banned by admin {update.effective_user.id}")
+        else:
+            await update.message.reply_text("❌ فشل في حظر المستخدم")
+        
+    except Exception as e:
+        logger.error(f"Error in ban_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+
+async def unban_command(update: Update, context: CallbackContext) -> None:
+    """Handle /unban command - unban a user (admin only)."""
+    try:
+        # Check if message is from admin group
+        if update.effective_chat.id != ADMIN_GROUP_ID:
+            await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
+            return
+        
+        # Check if user ID is provided
+        if not context.args:
+            await update.message.reply_text("⚠️ يرجى تحديد معرف المستخدم\n\nمثال: /unban 123456789")
+            return
+        
+        try:
+            user_id = int(context.args[0])
+        except ValueError:
+            await update.message.reply_text("⚠️ معرف المستخدم يجب أن يكون رقماً")
+            return
+        
+        # Unban the user
+        if data_manager.unban_user(user_id):
+            await update.message.reply_text(f"✅ تم إلغاء حظر المستخدم {user_id} بنجاح")
+            logger.info(f"User {user_id} unbanned by admin {update.effective_user.id}")
+        else:
+            await update.message.reply_text("❌ فشل في إلغاء حظر المستخدم")
+        
+    except Exception as e:
+        logger.error(f"Error in unban_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
 
 async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
-    """Handle admin text replies to application notifications."""
+    """Handle admin text replies to user applications."""
     try:
         # Check if message is from admin group
         if update.effective_chat.id != ADMIN_GROUP_ID:
@@ -1399,16 +1004,7 @@ async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
         if update.effective_user.last_name:
             admin_name += f" {update.effective_user.last_name}"
         
-        admin_id = update.effective_user.id
-        
-        # Start/update conversation tracking
-        active_conversations[user_id] = {
-            'admin_id': admin_id,
-            'admin_name': admin_name,
-            'active': True
-        }
-        
-        # Format the reply message
+        # Prepare reply message
         reply_text = f"""
 📩 <b>رد من فريق Our Goal:</b>
 
@@ -1418,7 +1014,6 @@ async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
 📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 💡 <b>يمكنك الرد على هذه الرسالة وسيتم توصيلها للإدارة</b>
-📷 <b>يمكنك أيضاً إرسال صور وفيديوهات ورسائل صوتية!</b>
 """
         
         # Send reply to the original user
@@ -1431,175 +1026,74 @@ async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
         # React to the admin message to show it was sent
         await update.message.reply_text("✅ تم إرسال الرد للمتقدم بنجاح")
         
-        logger.info(f"Admin reply sent from {admin_id} to user {user_id}")
+        logger.info(f"Admin reply sent from {update.effective_user.id} to user {user_id}")
         
     except Exception as e:
         logger.error(f"Failed to send admin reply: {e}")
         await update.message.reply_text("❌ فشل في إرسال الرد للمتقدم")
 
 async def handle_end_conversation(update: Update, context: CallbackContext) -> None:
-    """Handle ending conversation between user and admin."""
+    """Handle end conversation button."""
     query = update.callback_query
     await query.answer()
     
     try:
-        # Check if message is from admin group
-        if query.message.chat.id != ADMIN_GROUP_ID:
-            await query.answer("هذا الأمر مخصص للإدارة فقط", show_alert=True)
-            return
-        
-        # Parse callback data
-        if not query.data.startswith("end_chat_"):
-            return
-        
+        # Parse callback data: end_chat_user_id
         user_id = int(query.data.split("_")[2])
         
-        # End the conversation
+        # Remove from active conversations
         if user_id in active_conversations:
-            active_conversations[user_id]['active'] = False
+            del active_conversations[user_id]
         
-        # Get admin info
-        admin_name = query.from_user.first_name
-        if query.from_user.last_name:
-            admin_name += f" {query.from_user.last_name}"
+        # Update the message
+        await query.edit_message_text(
+            f"{query.message.text}\n\n✅ تم إنهاء المحادثة مع المستخدم {user_id}"
+        )
         
-        # Notify user that conversation ended
+        # Notify user
         await context.bot.send_message(
             chat_id=user_id,
-            text=f"""
-🔚 <b>تم إنهاء المحادثة</b>
-
-تم إنهاء المحادثة من قبل الإدارة.
-
-شكراً لك على تواصلك معنا! 🙏
-
----
-🛑 <b>تم الإنهاء بواسطة:</b> {admin_name}
-📅 <b>وقت الإنهاء:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-""",
-            parse_mode='HTML'
+            text="📝 تم إنهاء المحادثة مع الإدارة. شكراً لك!"
         )
         
-        # Update admin message
-        await query.edit_message_text(
-            text=f"{query.message.text}\n\n🔚 تم إنهاء المحادثة بواسطة {admin_name}",
-            parse_mode='HTML'
-        )
-        
-        logger.info(f"Conversation ended between user {user_id} and admin {query.from_user.id}")
+        logger.info(f"Conversation ended with user {user_id} by admin {query.from_user.id}")
         
     except Exception as e:
         logger.error(f"Failed to end conversation: {e}")
         await query.answer("حدث خطأ في إنهاء المحادثة", show_alert=True)
 
-async def handle_user_reply(update: Update, context: CallbackContext) -> None:
-    """Handle user text replies in active conversations."""
-    user_id = update.effective_user.id
-    
-    try:
-        # Check if user has an active conversation
-        if user_id not in active_conversations or not active_conversations[user_id]['active']:
-            return
-        
-        conversation = active_conversations[user_id]
-        admin_name = conversation['admin_name']
-        
-        # Get user info
-        user_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            user_name += f" {update.effective_user.last_name}"
-        
-        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
-        
-        # Format message to admin
-        admin_message = f"""
-💬 <b>رد من المتقدم:</b>
-
-{update.message.text}
-
----
-👤 <b>من:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_id}
-📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to admin group
-        sent_message = await context.bot.send_message(
-            chat_id=ADMIN_GROUP_ID,
-            text=admin_message,
-            parse_mode='HTML'
-        )
-        
-        # Store mapping for potential replies
-        admin_message_to_user[sent_message.message_id] = user_id
-        
-        # Confirm to user
-        await update.message.reply_text("✅ تم إرسال رسالتك للإدارة")
-        
-        logger.info(f"User reply forwarded from {user_id} to admin group")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle user reply: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الرسالة")
-
-async def ban_command(update: Update, context: CallbackContext) -> None:
-    """Handle /ban command - ban a user by ID."""
-    if update.effective_chat.id != ADMIN_GROUP_ID:
-        await update.message.reply_text(NO_STATS_PERMISSION)
-        return
-
-    if not context.args:
-        await update.message.reply_text("الرجاء تحديد معرف المستخدم للحظر. مثال: /ban 123456789")
-        return
-
-    try:
-        user_id_to_ban = int(context.args[0])
-        if data_manager.ban_user(user_id_to_ban):
-            await update.message.reply_text(f"تم حظر المستخدم {user_id_to_ban} بنجاح.")
-            logger.info(f"Admin {update.effective_user.id} banned user {user_id_to_ban}")
-        else:
-            await update.message.reply_text(f"المستخدم {user_id_to_ban} محظور بالفعل.")
-    except ValueError:
-        await update.message.reply_text("معرف المستخدم غير صالح. الرجاء إدخال رقم صحيح.")
-    except Exception as e:
-        logger.error(f"Error in ban_command: {e}")
-        await update.message.reply_text(ERROR_MESSAGE)
-
-async def unban_command(update: Update, context: CallbackContext) -> None:
-    """Handle /unban command - unban a user by ID."""
-    if update.effective_chat.id != ADMIN_GROUP_ID:
-        await update.message.reply_text(NO_STATS_PERMISSION)
-        return
-
-    if not context.args:
-        await update.message.reply_text("الرجاء تحديد معرف المستخدم لإلغاء الحظر. مثال: /unban 123456789")
-        return
-
-    try:
-        user_id_to_unban = int(context.args[0])
-        if data_manager.unban_user(user_id_to_unban):
-            await update.message.reply_text(f"تم إلغاء حظر المستخدم {user_id_to_unban} بنجاح.")
-            logger.info(f"Admin {update.effective_user.id} unbanned user {user_id_to_unban}")
-        else:
-            await update.message.reply_text(f"المستخدم {user_id_to_unban} غير محظور بالفعل.")
-    except ValueError:
-        await update.message.reply_text("معرف المستخدم غير صالح. الرجاء إدخال رقم صحيح.")
-    except Exception as e:
-        logger.error(f"Error in unban_command: {e}")
-        await update.message.reply_text(ERROR_MESSAGE)
-
 async def handle_unknown_message(update: Update, context: CallbackContext) -> None:
-    """Handle unknown messages outside of conversation."""
-    user_id = update.effective_user.id
-    
+    """Handle unknown text messages."""
     try:
-        # Check if user has an active conversation
-        if user_id in active_conversations and active_conversations[user_id]['active']:
-            await handle_user_reply(update, context)
-        else:
-            await update.message.reply_text(UNKNOWN_MESSAGE)
-            
+        await update.message.reply_text(UNKNOWN_MESSAGE, parse_mode='HTML')
+        
     except Exception as e:
         logger.error(f"Error in handle_unknown_message: {e}")
-        await update.message.reply_text(ERROR_MESSAGE)
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+
+# Media handlers for users (placeholder functions)
+async def handle_user_photo(update: Update, context: CallbackContext) -> None:
+    """Handle photo messages from users."""
+    pass
+
+async def handle_user_video(update: Update, context: CallbackContext) -> None:
+    """Handle video messages from users."""
+    pass
+
+async def handle_user_audio(update: Update, context: CallbackContext) -> None:
+    """Handle audio messages from users."""
+    pass
+
+# Media handlers for admins (placeholder functions)
+async def handle_admin_photo(update: Update, context: CallbackContext) -> None:
+    """Handle photo messages from admin."""
+    pass
+
+async def handle_admin_video(update: Update, context: CallbackContext) -> None:
+    """Handle video messages from admin."""
+    pass
+
+async def handle_admin_audio(update: Update, context: CallbackContext) -> None:
+    """Handle audio messages from admin."""
+    pass
 
