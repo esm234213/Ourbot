@@ -40,6 +40,11 @@ async def start_command(update: Update, context: CallbackContext) -> None:
     user = update.effective_user
     
     try:
+        if data_manager.is_user_banned(user.id):
+            await update.message.reply_text("لقد تم حظرك من استخدام البوت.")
+            logger.info(f"Banned user {user.id} tried to start the bot.")
+            return
+
         # Create inline keyboard with team options
         keyboard = []
         row = []
@@ -1504,4 +1509,53 @@ async def handle_unknown_message(update: Update, context: CallbackContext) -> No
     except Exception as e:
         logger.error(f"Error in handle_unknown_message: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
+
+
+
+async def ban_command(update: Update, context: CallbackContext) -> None:
+    """Handle /ban command - ban a user by ID."""
+    if update.effective_user.id != ADMIN_GROUP_ID:
+        await update.message.reply_text(NO_STATS_PERMISSION)
+        return
+
+    if not context.args:
+        await update.message.reply_text("الرجاء تحديد معرف المستخدم للحظر. مثال: /ban 123456789")
+        return
+
+    try:
+        user_id_to_ban = int(context.args[0])
+        if data_manager.ban_user(user_id_to_ban):
+            await update.message.reply_text(f"تم حظر المستخدم {user_id_to_ban} بنجاح.")
+            logger.info(f"Admin {update.effective_user.id} banned user {user_id_to_ban}")
+        else:
+            await update.message.reply_text(f"المستخدم {user_id_to_ban} محظور بالفعل.")
+    except ValueError:
+        await update.message.reply_text("معرف المستخدم غير صالح. الرجاء إدخال رقم صحيح.")
+    except Exception as e:
+        logger.error(f"Error in ban_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+
+async def unban_command(update: Update, context: CallbackContext) -> None:
+    """Handle /unban command - unban a user by ID."""
+    if update.effective_user.id != ADMIN_GROUP_ID:
+        await update.message.reply_text(NO_STATS_PERMISSION)
+        return
+
+    if not context.args:
+        await update.message.reply_text("الرجاء تحديد معرف المستخدم لإلغاء الحظر. مثال: /unban 123456789")
+        return
+
+    try:
+        user_id_to_unban = int(context.args[0])
+        if data_manager.unban_user(user_id_to_unban):
+            await update.message.reply_text(f"تم إلغاء حظر المستخدم {user_id_to_unban} بنجاح.")
+            logger.info(f"Admin {update.effective_user.id} unbanned user {user_id_to_unban}")
+        else:
+            await update.message.reply_text(f"المستخدم {user_id_to_unban} غير محظور بالفعل.")
+    except ValueError:
+        await update.message.reply_text("معرف المستخدم غير صالح. الرجاء إدخال رقم صحيح.")
+    except Exception as e:
+        logger.error(f"Error in unban_command: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
+
 
