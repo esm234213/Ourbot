@@ -18,6 +18,7 @@ class DataManager:
         self.applications = self._load_json(APPLICATIONS_FILE, [])
         self.users = self._load_json(USERS_FILE, {})
         self.stats = self._load_json(STATS_FILE, {})
+        self.banned_users = self._load_json(BANNED_USERS_FILE, [])
         self._ensure_data_integrity()
     
     def _load_json(self, filename: str, default_value: Any) -> Any:
@@ -334,4 +335,27 @@ class DataManager:
         except Exception as e:
             logger.error(f"Failed to delete application {application_id}: {e}")
             return False
+
+
+
+    def ban_user(self, user_id: int) -> bool:
+        """Add a user to the banned list."""
+        user_id_str = str(user_id)
+        if user_id_str not in self.banned_users:
+            self.banned_users.append(user_id_str)
+            return self._save_json(BANNED_USERS_FILE, self.banned_users)
+        return False
+
+    def unban_user(self, user_id: int) -> bool:
+        """Remove a user from the banned list."""
+        user_id_str = str(user_id)
+        if user_id_str in self.banned_users:
+            self.banned_users.remove(user_id_str)
+            return self._save_json(BANNED_USERS_FILE, self.banned_users)
+        return False
+
+    def is_user_banned(self, user_id: int) -> bool:
+        """Check if a user is banned."""
+        return str(user_id) in self.banned_users
+
 
