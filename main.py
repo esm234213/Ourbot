@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# -*- ةةةcoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import os
 import logging
 import sys
-from dotenv import load_dotenv
+
 from telegram import BotCommand, MenuButton, MenuButtonCommands
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ConversationHandler, filters
 from handlers import (
@@ -20,13 +20,15 @@ from handlers import (
     cancel_command,
     stats_command,
     broadcast_command,
+    handle_broadcast_type,           # NEW: Add this import
     handle_broadcast_message,
+    handle_broadcast_image,          # NEW: Add this import
     clear_applications_command,
     handle_admin_reply,
     handle_admin_decision,
     handle_end_conversation,
     handle_unknown_message,
-    # New media handlers
+    # Media handlers
     handle_admin_photo,
     handle_admin_video,
     handle_admin_audio,
@@ -39,9 +41,11 @@ from handlers import (
     ASKING_REASON,
     ASKING_EXPERIENCE,
     ASKING_WHATSAPP,
-    ASKING_BROADCAST_MESSAGE
+    ASKING_BROADCAST_TYPE,           # NEW: Add this import
+    ASKING_BROADCAST_MESSAGE,
+    ASKING_BROADCAST_IMAGE           # NEW: Add this import
 )
-from config import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT
+from config import ADMIN_GROUP_ID, BOT_NAME, BOT_VERSION, LOG_LEVEL, LOG_FORMAT, BOT_TOKEN
 
 # Configure logging
 logging.basicConfig(
@@ -55,27 +59,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+
 
 def validate_environment():
     """Validate required environment variables."""
-    bot_token = os.getenv("BOT_TOKEN")
-    admin_group_id = os.getenv("ADMIN_GROUP_ID")
-    
-    if not bot_token:
-        logger.error("BOT_TOKEN environment variable is required!")
-        return False
-    
-    if not admin_group_id:
-        logger.error("ADMIN_GROUP_ID environment variable is required!")
-        return False
-    
-    try:
-        int(admin_group_id)
-    except ValueError:
-        logger.error("ADMIN_GROUP_ID must be a valid integer!")
-        return False
-    
     return True
 
 async def setup_bot_commands(application):
@@ -88,7 +75,7 @@ async def setup_bot_commands(application):
             BotCommand("status", "عرض حالة طلباتك"),
             BotCommand("cancel", "إلغاء العملية الحالية"),
             BotCommand("stats", "إحصائيات التقديمات (للإدارة فقط)"),
-            BotCommand("broadcast", "إرسال رسالة جماعية (للإدارة فقط)"),
+            BotCommand("broadcast", "إرسال رسالة جماعية مع دعم الصور (للإدارة فقط)"),  # Updated description
             BotCommand("ban", "حظر مستخدم (للإدارة فقط)"),
             BotCommand("unban", "إلغاء حظر مستخدم (للإدارة فقط)"),
             BotCommand("clear", "مسح جميع التقديمات (للإدارة فقط)")
@@ -121,7 +108,7 @@ async def error_handler(update, context):
 
 def main():
     """Start the bot."""
-    logger.info(f"Starting {BOT_NAME} v{BOT_VERSION} with Enhanced Media Support")
+    logger.info(f"Starting {BOT_NAME} v{BOT_VERSION} with Enhanced Media Support & Image Broadcast")
     
     # Validate environment
     if not validate_environment():
@@ -129,10 +116,10 @@ def main():
         sys.exit(1)
     
     # Get bot token from environment
-    bot_token = os.getenv("BOT_TOKEN")
+
     
     # Create application
-    application = Application.builder().token(bot_token).build()
+    application = Application.builder().token(BOT_TOKEN).build()
     
     # Set post init callback
     application.post_init = setup_bot_commands
@@ -166,14 +153,20 @@ def main():
         allow_reentry=True
     )
     
-    # Define conversation handler for broadcast
+    # UPDATED: Enhanced broadcast conversation handler with image support
     broadcast_conversation = ConversationHandler(
         entry_points=[
             CommandHandler("broadcast", broadcast_command)
         ],
         states={
+            ASKING_BROADCAST_TYPE: [
+                CallbackQueryHandler(handle_broadcast_type, pattern="^broadcast_")
+            ],
             ASKING_BROADCAST_MESSAGE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_broadcast_message)
+            ],
+            ASKING_BROADCAST_IMAGE: [
+                MessageHandler(filters.PHOTO, handle_broadcast_image)
             ],
         },
         fallbacks=[
@@ -182,7 +175,7 @@ def main():
         allow_reentry=False
     )
     
-    # Add handlers in order of priority
+    # Add basic command handlers
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("menu", menu_command))
     application.add_handler(CommandHandler("help", help_command))
@@ -193,7 +186,7 @@ def main():
     application.add_handler(CommandHandler("unban", unban_command))
     application.add_handler(CommandHandler("cancel", cancel_command))
     
-    # Add conversation handlers
+    # Add conversation handlers (order matters!)
     application.add_handler(application_conversation)
     application.add_handler(broadcast_conversation)
     
@@ -244,25 +237,32 @@ def main():
     # Handle unknown text messages (must be last)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_message))
     
-    # Log startup
-    logger.info(f"{BOT_NAME} started successfully with enhanced media support!")
+    # Log startup information
+    logger.info(f"{BOT_NAME} started successfully with enhanced media support & image broadcast!")
     logger.info(f"Admin Group ID: {ADMIN_GROUP_ID}")
-    logger.info("Supported media types: Photos, Videos, Audio, Voice messages")
+    logger.info("🚀 Features enabled:")
+    logger.info("  📱 Media types: Photos, Videos, Audio, Voice messages")
+    logger.info("  📢 Broadcast types: Text-only, Image with text")
+    logger.info("  💬 Admin-User conversations with media support")
+    logger.info("  🛡️ User ban/unban functionality")
+    logger.info("  📊 Statistics and data management")
+    logger.info("  🔄 Application status tracking")
     
     # Run the bot
     try:
+        logger.info("🤖 Bot is now polling for updates...")
         application.run_polling(
             allowed_updates=["message", "callback_query"],
             drop_pending_updates=True
         )
     except KeyboardInterrupt:
-        logger.info("Bot stopped by user")
+        logger.info("🛑 Bot stopped by user (Ctrl+C)")
     except Exception as e:
-        logger.error(f"Bot crashed: {e}")
+        logger.error(f"💥 Bot crashed with error: {e}")
         sys.exit(1)
+    finally:
+        logger.info("👋 Bot shutdown complete")
 
 if __name__ == "__main__":
     main()
-
-
 
