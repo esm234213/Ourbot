@@ -7,7 +7,7 @@ import shutil
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
-from config import APPLICATIONS_FILE, USERS_FILE, STATS_FILE, COOLDOWN_HOURS
+from config import APPLICATIONS_FILE, USERS_FILE, STATS_FILE, COOLDOWN_HOURS, BANNED_USERS_FILE
 
 logger = logging.getLogger(__name__)
 
