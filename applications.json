@@ -13,18 +13,7 @@
     "experience": "نبنيني",
     "timestamp": "2025-07-17T00:02:21.937947"
   },
-  {
-    "team_name": "Unknown",
-    "selected_team": "unknown",
-    "experience": "لا يوجد.",
-    "timestamp": "Unknown",
-    "user_info": {
-      "first_name": "Unknown",
-      "username": "",
-      "user_id": null,
-      "timestamp": "Unknown"
-    }
-  },
+  
   {
     "team_name": "تيم السوشيال",
     "selected_team": "team_social",
