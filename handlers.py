@@ -1514,7 +1514,7 @@ async def handle_unknown_message(update: Update, context: CallbackContext) -> No
 
 async def ban_command(update: Update, context: CallbackContext) -> None:
     """Handle /ban command - ban a user by ID."""
-    if update.effective_user.id != ADMIN_GROUP_ID:
+    if update.effective_chat.id != ADMIN_GROUP_ID:
         await update.message.reply_text(NO_STATS_PERMISSION)
         return
 
@@ -1537,7 +1537,7 @@ async def ban_command(update: Update, context: CallbackContext) -> None:
 
 async def unban_command(update: Update, context: CallbackContext) -> None:
     """Handle /unban command - unban a user by ID."""
-    if update.effective_user.id != ADMIN_GROUP_ID:
+    if update.effective_chat.id != ADMIN_GROUP_ID:
         await update.message.reply_text(NO_STATS_PERMISSION)
         return
 
