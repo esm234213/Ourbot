@@ -13,20 +13,7 @@
     ],
     "last_active": "2025-07-17T00:02:21.937947"
   },
-  "None": {
-    "first_name": "Unknown",
-    "last_name": "",
-    "username": "",
-    "first_seen": "Unknown",
-    "applications": [
-      {
-        "team_id": "unknown",
-        "team_name": "Unknown",
-        "timestamp": "Unknown"
-      }
-    ],
-    "last_active": "Unknown"
-  },
+  
   "6244538203": {
     "first_name": "Yassin Ashraf",
     "last_name": "",
