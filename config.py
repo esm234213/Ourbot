@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Bot configuration
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_GROUP_ID = int(os.getenv("ADMIN_GROUP_ID", "0"))
+BOT_TOKEN = "8237754570:AAGLOx_lg-bZfUs3X8XGCZNBRJ9s8TtUiJI"
+ADMIN_GROUP_ID = -1002805445125
 
 # Conversation states
 ASKING_GENDER = 1
