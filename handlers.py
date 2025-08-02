@@ -22,8 +22,16 @@ admin_message_to_user = {}
 # Format: {user_id: {'admin_id': admin_id, 'active': True}}
 active_conversations = {}
 
+# Conversation states
+ASKING_GENDER = 1
+ASKING_REASON = 2
+ASKING_EXPERIENCE = 3
+ASKING_WHATSAPP = 4
+
 # Conversation states for broadcast
+ASKING_BROADCAST_TYPE = 9
 ASKING_BROADCAST_MESSAGE = 10
+ASKING_BROADCAST_IMAGE = 11
 
 # Media directories
 MEDIA_DIR = "media"
@@ -1059,7 +1067,7 @@ async def handle_user_audio(update: Update, context: CallbackContext) -> None:
         logger.error(f"Failed to handle user audio: {e}")
         await update.message.reply_text("❌ فشل في إرسال الملف الصوتي")
 
-# Rest of the original functions remain the same...
+# Statistics and admin functions
 async def stats_command(update: Update, context: CallbackContext) -> None:
     """Handle /stats command - show application statistics (admin only)."""
     try:
@@ -1107,16 +1115,158 @@ async def broadcast_command(update: Update, context: CallbackContext) -> int:
             await update.message.reply_text("⚠️ هذا الأمر مخصص للإدارة فقط")
             return ConversationHandler.END
         
-        await update.message.reply_text(BROADCAST_PROMPT, parse_mode='HTML')
-        return ASKING_BROADCAST_MESSAGE
+        # Ask for broadcast type
+        keyboard = [
+            [
+                InlineKeyboardButton("📝 نص فقط", callback_data="broadcast_text"),
+                InlineKeyboardButton("🖼️ صورة مع نص", callback_data="broadcast_image")
+            ],
+            [InlineKeyboardButton("❌ إلغاء", callback_data="broadcast_cancel")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(
+            "📢 <b>اختر نوع الرسالة الإذاعية:</b>",
+            reply_markup=reply_markup,
+            parse_mode='HTML'
+        )
+        return ASKING_BROADCAST_TYPE
         
     except Exception as e:
         logger.error(f"Error in broadcast_command: {e}")
         await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
         return ConversationHandler.END
 
+async def handle_broadcast_type(update: Update, context: CallbackContext) -> int:
+    """Handle broadcast type selection."""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        if query.data == "broadcast_cancel":
+            await query.edit_message_text("❌ تم إلغاء الإرسال الإذاعي.")
+            return ConversationHandler.END
+        
+        elif query.data == "broadcast_text":
+            context.user_data['broadcast_type'] = 'text'
+            await query.edit_message_text(BROADCAST_PROMPT, parse_mode='HTML')
+            return ASKING_BROADCAST_MESSAGE
+        
+        elif query.data == "broadcast_image":
+            context.user_data['broadcast_type'] = 'image'
+            await query.edit_message_text(
+                "🖼️ <b>أرسل الصورة التي تريد إرسالها في الرسالة الإذاعية:</b>\n\n"
+                "💡 يمكنك إضافة نص مع الصورة كتعليق (caption)",
+                parse_mode='HTML'
+            )
+            return ASKING_BROADCAST_IMAGE
+        
+    except Exception as e:
+        logger.error(f"Error in handle_broadcast_type: {e}")
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+        return ConversationHandler.END
+
+async def handle_broadcast_image(update: Update, context: CallbackContext) -> int:
+    """Handle broadcast image input."""
+    try:
+        if not update.message.photo:
+            await update.message.reply_text(
+                "⚠️ يرجى إرسال صورة صالحة.\n\n"
+                "💡 يمكنك إضافة نص مع الصورة كتعليق"
+            )
+            return ASKING_BROADCAST_IMAGE
+        
+        # Save the image
+        photo = update.message.photo[-1]  # Get highest resolution
+        file_path = await save_media_file(photo, "photo", update.effective_user.id)
+        
+        if not file_path:
+            await update.message.reply_text("❌ فشل في حفظ الصورة. يرجى المحاولة مرة أخرى.")
+            return ASKING_BROADCAST_IMAGE
+        
+        # Store image info
+        context.user_data['broadcast_image_path'] = file_path
+        context.user_data['broadcast_caption'] = update.message.caption or ""
+        
+        # Get all users
+        all_users = data_manager.get_all_users()
+        
+        if not all_users:
+            await update.message.reply_text("❌ لا يوجد مستخدمين لإرسال الرسالة إليهم.")
+            return ConversationHandler.END
+        
+        # Send broadcast image
+        sent_count = 0
+        failed_count = 0
+        
+        # Prepare caption
+        caption = context.user_data['broadcast_caption']
+        if caption:
+            formatted_caption = f"""
+📢 <b>رسالة من فريق Our Goal</b>
+
+{caption}
+
+---
+📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        else:
+            formatted_caption = f"""
+📢 <b>رسالة من فريق Our Goal</b>
+
+---
+📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to all users
+        for user_id in all_users:
+            try:
+                with open(file_path, 'rb') as photo_file:
+                    await context.bot.send_photo(
+                        chat_id=user_id,
+                        photo=photo_file,
+                        caption=formatted_caption,
+                        parse_mode='HTML'
+                    )
+                sent_count += 1
+            except Exception as e:
+                logger.warning(f"Failed to send broadcast image to user {user_id}: {e}")
+                failed_count += 1
+        
+        # Send confirmation to admin
+        confirmation_text = f"""
+✅ <b>تم إرسال الرسالة الإذاعية بالصورة بنجاح!</b>
+
+📊 <b>الإحصائيات:</b>
+• تم الإرسال بنجاح: {sent_count} مستخدم
+• فشل الإرسال: {failed_count} مستخدم
+• إجمالي المحاولات: {sent_count + failed_count}
+
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+🖼️ <b>نوع الرسالة:</b> صورة مع نص
+"""
+        
+        await update.message.reply_text(confirmation_text, parse_mode='HTML')
+        
+        # Clean up
+        try:
+            os.remove(file_path)
+        except:
+            pass
+        
+        context.user_data.clear()
+        
+        logger.info(f"Broadcast image sent to {sent_count} users, failed for {failed_count} users")
+        return ConversationHandler.END
+        
+    except Exception as e:
+        logger.error(f"Error in handle_broadcast_image: {e}")
+        await update.message.reply_text(ERROR_MESSAGE, parse_mode='HTML')
+        return ConversationHandler.END
+
 async def handle_broadcast_message(update: Update, context: CallbackContext) -> int:
-    """Handle broadcast message input."""
+    """Handle broadcast text message input."""
     try:
         broadcast_text = update.message.text.strip()
         
@@ -1158,15 +1308,24 @@ async def handle_broadcast_message(update: Update, context: CallbackContext) -> 
                 failed_count += 1
         
         # Send confirmation to admin
-        confirmation_text = BROADCAST_SENT.format(
-            sent_count=sent_count,
-            failed_count=failed_count,
-            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        )
+        confirmation_text = f"""
+✅ <b>تم إرسال الرسالة الإذاعية بنجاح!</b>
+
+📊 <b>الإحصائيات:</b>
+• تم الإرسال بنجاح: {sent_count} مستخدم
+• فشل الإرسال: {failed_count} مستخدم
+• إجمالي المحاولات: {sent_count + failed_count}
+
+📅 <b>وقت الإرسال:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+📝 <b>نوع الرسالة:</b> نص فقط
+"""
         
         await update.message.reply_text(confirmation_text, parse_mode='HTML')
         
-        logger.info(f"Broadcast sent to {sent_count} users, failed for {failed_count} users")
+        context.user_data.clear()
+        
+        logger.info(f"Broadcast text sent to {sent_count} users, failed for {failed_count} users")
         return ConversationHandler.END
         
     except Exception as e:
@@ -1278,168 +1437,6 @@ async def handle_admin_reply(update: Update, context: CallbackContext) -> None:
         logger.error(f"Failed to send admin reply: {e}")
         await update.message.reply_text("❌ فشل في إرسال الرد للمتقدم")
 
-async def handle_admin_decision(update: Update, context: CallbackContext) -> None:
-    """Handle admin accept/reject button clicks."""
-    query = update.callback_query
-    await query.answer()
-    
-    try:
-        # Check if message is from admin group
-        if query.message.chat.id != ADMIN_GROUP_ID:
-            await query.answer("هذا الأمر مخصص للإدارة فقط", show_alert=True)
-            return
-        
-        # Parse callback data
-        callback_data = query.data
-        if not (callback_data.startswith("accept_") or callback_data.startswith("reject_")):
-            return
-        
-        parts = callback_data.split("_")
-        decision = parts[0]  # "accept" or "reject"
-        user_id = int(parts[1])
-        team_id = parts[2]
-        
-        # First try to get team name from TEAMS dictionary
-        team_name = TEAMS.get(team_id, None)
-        
-        # If not found in TEAMS, search in applications data
-        if not team_name or team_name == "غير معروف":
-            user_applications = data_manager.get_user_applications(user_id)
-            for app in user_applications:
-                if app.get('selected_team') == team_id:
-                    team_name = app.get('team_name', 'غير معروف')
-                    break
-            
-            # If still not found, search in all applications
-            if not team_name or team_name == "غير معروف":
-                all_applications = data_manager.applications
-                for app in all_applications:
-                    if (app.get('user_info', {}).get('user_id') == user_id and 
-                        app.get('selected_team') == team_id):
-                        team_name = app.get('team_name', 'غير معروف')
-                        break
-        
-        # If still not found, use a fallback based on team_id
-        if not team_name or team_name == "غير معروف":
-            team_name_map = {
-                "team_exams": "تيم الاختبارات",
-                "team_collections": "تيم التجميعات", 
-                "team_support": "تيم الدعم الفني"
-            }
-            team_name = team_name_map.get(team_id, f"التيم ({team_id})")
-        
-        # Get admin info
-        admin_name = query.from_user.first_name
-        if query.from_user.last_name:
-            admin_name += f" {query.from_user.last_name}"
-        
-        # Prepare message based on decision
-        if decision == "accept":
-            user_message = f"""
-🎉 <b>تهانينا! تم قبول طلبك</b>
-
-مرحباً بك في {team_name}! 🎯
-
-تم قبول طلبك للانضمام لفريقنا. نحن متحمسون لوجودك معنا!
-
-سيتم التواصل معك قريباً من قبل مسؤول الفريق لإعطائك التفاصيل والخطوات التالية.
-
-نتطلع للعمل معك! 🤝
-
----
-✅ <b>تم الموافقة بواسطة:</b> {admin_name}
-📅 <b>تاريخ القبول:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-            admin_confirmation = f"✅ تم قبول المتقدم في {team_name} وإرسال رسالة التهنئة"
-        else:
-            user_message = f"""
-📝 <b>شكراً لك على اهتمامك</b>
-
-نشكرك على تقديمك للانضمام لـ {team_name}.
-
-للأسف، لم نتمكن من قبول طلبك في الوقت الحالي. هذا لا يعني أن طلبك لم يكن جيداً، لكن لدينا عدد محدود من الأماكن المتاحة.
-
-نشجعك على المحاولة مرة أخرى في المستقبل أو التقديم لفريق آخر.
-
-شكراً لك مرة أخرى!
-
----
-❌ <b>تم الرفض بواسطة:</b> {admin_name}
-📅 <b>تاريخ الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-            admin_confirmation = f"❌ تم رفض المتقدم من {team_name} وإرسال رسالة مهذبة"
-        
-        # Send message to user
-        await context.bot.send_message(
-            chat_id=user_id,
-            text=user_message,
-            parse_mode='HTML'
-        )
-        
-        # Update admin message to show decision was made
-        original_text = query.message.text
-        updated_text = f"{original_text}\n\n{admin_confirmation}"
-        
-        await query.edit_message_text(
-            text=updated_text,
-            parse_mode='HTML'
-        )
-        
-        logger.info(f"Admin decision: {decision} for user {user_id} in team {team_name} by {query.from_user.id}")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle admin decision: {e}")
-        await query.answer("حدث خطأ في معالجة القرار", show_alert=True)
-async def handle_user_reply(update: Update, context: CallbackContext) -> None:
-    """Handle user text replies in active conversations."""
-    user_id = update.effective_user.id
-    
-    try:
-        # Check if user has an active conversation
-        if user_id not in active_conversations or not active_conversations[user_id]['active']:
-            return
-        
-        conversation = active_conversations[user_id]
-        admin_name = conversation['admin_name']
-        
-        # Get user info
-        user_name = update.effective_user.first_name
-        if update.effective_user.last_name:
-            user_name += f" {update.effective_user.last_name}"
-        
-        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
-        
-        # Format message to admin
-        admin_message = f"""
-💬 <b>رد من المتقدم:</b>
-
-{update.message.text}
-
----
-👤 <b>من:</b> {user_name} {username_text}
-🆔 <b>معرف المستخدم:</b> {user_id}
-📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-"""
-        
-        # Send to admin group
-        sent_message = await context.bot.send_message(
-            chat_id=ADMIN_GROUP_ID,
-            text=admin_message,
-            parse_mode='HTML'
-        )
-        
-        # Store mapping for potential replies
-        admin_message_to_user[sent_message.message_id] = user_id
-        
-        # Confirm to user
-        await update.message.reply_text("✅ تم إرسال رسالتك للإدارة")
-        
-        logger.info(f"User reply forwarded from {user_id} to admin group")
-        
-    except Exception as e:
-        logger.error(f"Failed to handle user reply: {e}")
-        await update.message.reply_text("❌ فشل في إرسال الرسالة")
-
 async def handle_end_conversation(update: Update, context: CallbackContext) -> None:
     """Handle ending conversation between user and admin."""
     query = update.callback_query
@@ -1495,22 +1492,55 @@ async def handle_end_conversation(update: Update, context: CallbackContext) -> N
         logger.error(f"Failed to end conversation: {e}")
         await query.answer("حدث خطأ في إنهاء المحادثة", show_alert=True)
 
-async def handle_unknown_message(update: Update, context: CallbackContext) -> None:
-    """Handle unknown messages outside of conversation."""
+async def handle_user_reply(update: Update, context: CallbackContext) -> None:
+    """Handle user text replies in active conversations."""
     user_id = update.effective_user.id
     
     try:
         # Check if user has an active conversation
-        if user_id in active_conversations and active_conversations[user_id]['active']:
-            await handle_user_reply(update, context)
-        else:
-            await update.message.reply_text(UNKNOWN_MESSAGE)
-            
+        if user_id not in active_conversations or not active_conversations[user_id]['active']:
+            return
+        
+        conversation = active_conversations[user_id]
+        admin_name = conversation['admin_name']
+        
+        # Get user info
+        user_name = update.effective_user.first_name
+        if update.effective_user.last_name:
+            user_name += f" {update.effective_user.last_name}"
+        
+        username_text = f"(@{update.effective_user.username})" if update.effective_user.username else "(لا يوجد username)"
+        
+        # Format message to admin
+        admin_message = f"""
+💬 <b>رد من المتقدم:</b>
+
+{update.message.text}
+
+---
+👤 <b>من:</b> {user_name} {username_text}
+🆔 <b>معرف المستخدم:</b> {user_id}
+📅 <b>وقت الرد:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+        
+        # Send to admin group
+        sent_message = await context.bot.send_message(
+            chat_id=ADMIN_GROUP_ID,
+            text=admin_message,
+            parse_mode='HTML'
+        )
+        
+        # Store mapping for potential replies
+        admin_message_to_user[sent_message.message_id] = user_id
+        
+        # Confirm to user
+        await update.message.reply_text("✅ تم إرسال رسالتك للإدارة")
+        
+        logger.info(f"User reply forwarded from {user_id} to admin group")
+        
     except Exception as e:
-        logger.error(f"Error in handle_unknown_message: {e}")
-        await update.message.reply_text(ERROR_MESSAGE)
-
-
+        logger.error(f"Failed to handle user reply: {e}")
+        await update.message.reply_text("❌ فشل في إرسال الرسالة")
 
 async def ban_command(update: Update, context: CallbackContext) -> None:
     """Handle /ban command - ban a user by ID."""
@@ -1558,4 +1588,18 @@ async def unban_command(update: Update, context: CallbackContext) -> None:
         logger.error(f"Error in unban_command: {e}")
         await update.message.reply_text(ERROR_MESSAGE)
 
+async def handle_unknown_message(update: Update, context: CallbackContext) -> None:
+    """Handle unknown messages outside of conversation."""
+    user_id = update.effective_user.id
+    
+    try:
+        # Check if user has an active conversation
+        if user_id in active_conversations and active_conversations[user_id]['active']:
+            await handle_user_reply(update, context)
+        else:
+            await update.message.reply_text(UNKNOWN_MESSAGE)
+            
+    except Exception as e:
+        logger.error(f"Error in handle_unknown_message: {e}")
+        await update.message.reply_text(ERROR_MESSAGE)
 
