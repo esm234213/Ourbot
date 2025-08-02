@@ -33,6 +33,8 @@ from handlers import (
     handle_user_photo,
     handle_user_video,
     handle_user_audio,
+    ban_command,
+    unban_command,
     ASKING_GENDER,
     ASKING_REASON,
     ASKING_EXPERIENCE,
@@ -87,6 +89,8 @@ async def setup_bot_commands(application):
             BotCommand("cancel", "إلغاء العملية الحالية"),
             BotCommand("stats", "إحصائيات التقديمات (للإدارة فقط)"),
             BotCommand("broadcast", "إرسال رسالة جماعية (للإدارة فقط)"),
+            BotCommand("ban", "حظر مستخدم (للإدارة فقط)"),
+            BotCommand("unban", "إلغاء حظر مستخدم (للإدارة فقط)"),
             BotCommand("clear", "مسح جميع التقديمات (للإدارة فقط)")
         ]
         
@@ -185,6 +189,8 @@ def main():
     application.add_handler(CommandHandler("status", status_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CommandHandler("clear", clear_applications_command))
+    application.add_handler(CommandHandler("ban", ban_command))
+    application.add_handler(CommandHandler("unban", unban_command))
     application.add_handler(CommandHandler("cancel", cancel_command))
     
     # Add conversation handlers
@@ -257,4 +263,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
