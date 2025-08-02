@@ -12,5 +12,2323 @@
       }
     ],
     "last_active": "2025-07-17T00:02:21.937947"
+  },
+  "None": {
+    "first_name": "Unknown",
+    "last_name": "",
+    "username": "",
+    "first_seen": "Unknown",
+    "applications": [
+      {
+        "team_id": "unknown",
+        "team_name": "Unknown",
+        "timestamp": "Unknown"
+      }
+    ],
+    "last_active": "Unknown"
+  },
+  "6244538203": {
+    "first_name": "Yassin Ashraf",
+    "last_name": "",
+    "username": "Yassinash2009",
+    "first_seen": "2025-08-01T15:54:19",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:54:19"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:30:56"
+      }
+    ],
+    "last_active": "2025-08-01T15:54:19"
+  },
+  "5628243908": {
+    "first_name": "باسل وبس",
+    "last_name": "",
+    "username": "BASIIIIIIIIIIL",
+    "first_seen": "2025-08-01T15:54:57",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:54:57"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:53:04"
+      }
+    ],
+    "last_active": "2025-08-01T15:54:57"
+  },
+  "7997664189": {
+    "first_name": "رامي",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:57:32",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:57:32"
+      }
+    ],
+    "last_active": "2025-08-01T15:57:32"
+  },
+  "1954637855": {
+    "first_name": "ص",
+    "last_name": "",
+    "username": "siva_78",
+    "first_seen": "2025-08-01T15:59:55",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:59:55"
+      }
+    ],
+    "last_active": "2025-08-01T15:59:55"
+  },
+  "5467020443": {
+    "first_name": "𝐴𝑠𝑙𝑎𝑚 | 𝐸𝐸",
+    "last_name": "",
+    "username": "Mo7e_d",
+    "first_seen": "2025-08-01T16:01:10",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:01:10"
+      }
+    ],
+    "last_active": "2025-08-01T16:01:10"
+  },
+  "1257120979": {
+    "first_name": "مُحَہمَّد",
+    "last_name": "",
+    "username": "me_fooo",
+    "first_seen": "2025-08-01T16:01:48",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:01:48"
+      }
+    ],
+    "last_active": "2025-08-01T16:01:48"
+  },
+  "5839906231": {
+    "first_name": "Omar Youssef",
+    "last_name": "",
+    "username": "CapriceGuy",
+    "first_seen": "2025-08-01T16:07:40",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:07:40"
+      }
+    ],
+    "last_active": "2025-08-01T16:07:40"
+  },
+  "2113693833": {
+    "first_name": "𝐷𝑟 / 𝐻𝑖𝑡ℎ𝑎𝑚 𝐸𝑠𝑠𝑎𝑚🩺",
+    "last_name": "",
+    "username": "Dr_hith_oom",
+    "first_seen": "2025-08-01T16:09:59",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:09:59"
+      }
+    ],
+    "last_active": "2025-08-01T16:09:59"
+  },
+  "7084652168": {
+    "first_name": "Sh",
+    "last_name": "",
+    "username": "shadenb7r",
+    "first_seen": "2025-08-01T16:10:52",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:10:52"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T16:33:04"
+      }
+    ],
+    "last_active": "2025-08-01T16:33:04"
+  },
+  "5977827966": {
+    "first_name": "YOUSSEF",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T16:11:12",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:11:12"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T23:07:13"
+      }
+    ],
+    "last_active": "2025-08-01T23:07:13"
+  },
+  "5657652143": {
+    "first_name": "Hanin♡",
+    "last_name": "",
+    "username": "hanin_a4",
+    "first_seen": "2025-08-01T16:16:55",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T16:16:55"
+      }
+    ],
+    "last_active": "2025-08-01T16:16:55"
+  },
+  "5041342520": {
+    "first_name": "7",
+    "last_name": "",
+    "username": "M1_117",
+    "first_seen": "2025-08-01T16:18:25",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:18:25"
+      }
+    ],
+    "last_active": "2025-08-01T16:18:25"
+  },
+  "5106572800": {
+    "first_name": "أَحْـــــــــ𓂆ــمَـدُ | يا كريم يارب 🌱",
+    "last_name": "",
+    "username": "S_someone_1",
+    "first_seen": "2025-08-01T16:18:50",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:18:50"
+      }
+    ],
+    "last_active": "2025-08-01T16:18:50"
+  },
+  "1239206707": {
+    "first_name": "(لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّال",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T16:19:29",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:19:29"
+      }
+    ],
+    "last_active": "2025-08-01T16:19:29"
+  },
+  "5272460368": {
+    "first_name": "Soso",
+    "last_name": "",
+    "username": "Soso_Mo_kss",
+    "first_seen": "2025-08-01T16:21:34",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:21:34"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T14:53:54"
+      }
+    ],
+    "last_active": "2025-08-02T14:53:54"
+  },
+  "1602506737": {
+    "first_name": "Sa..rah",
+    "last_name": "",
+    "username": "SOo3590",
+    "first_seen": "2025-08-01T16:26:56",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T16:26:56"
+      }
+    ],
+    "last_active": "2025-08-01T16:26:56"
+  },
+  "5276315179": {
+    "first_name": "khaled amir",
+    "last_name": "",
+    "username": "ik7ld",
+    "first_seen": "2025-08-01T16:32:19",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:32:19"
+      }
+    ],
+    "last_active": "2025-08-01T16:32:19"
+  },
+  "7726601484": {
+    "first_name": "𝓓𝓻.𝓗𝓪𝓫𝓲𝓫𝓪🥼🩺",
+    "last_name": "",
+    "username": "b_e_b_o_1_7",
+    "first_seen": "2025-08-01T16:32:41",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T16:32:41"
+      }
+    ],
+    "last_active": "2025-08-01T16:32:41"
+  },
+  "5658106431": {
+    "first_name": ". .",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T16:38:34",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:38:34"
+      }
+    ],
+    "last_active": "2025-08-01T16:38:34"
+  },
+  "7154370676": {
+    "first_name": "مهند",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T16:45:44",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T16:45:44"
+      }
+    ],
+    "last_active": "2025-08-01T16:45:44"
+  },
+  "6458815143": {
+    "first_name": "Mai Nassar",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T17:11:41",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:11:41"
+      }
+    ],
+    "last_active": "2025-08-01T17:11:41"
+  },
+  "2041519832": {
+    "first_name": "Fatma Mustafa",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T17:12:47",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:12:47"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:19:37"
+      }
+    ],
+    "last_active": "2025-08-01T17:19:37"
+  },
+  "6382391632": {
+    "first_name": "Rahma Shaker",
+    "last_name": "",
+    "username": "r_ah_ma_0",
+    "first_seen": "2025-08-01T17:12:57",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:12:57"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:14:40"
+      }
+    ],
+    "last_active": "2025-08-01T17:14:40"
+  },
+  "5589004744": {
+    "first_name": "J.Amr",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T17:14:46",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:14:46"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:16:02"
+      }
+    ],
+    "last_active": "2025-08-01T17:16:02"
+  },
+  "1544655761": {
+    "first_name": "نور",
+    "last_name": "",
+    "username": "nour_3467",
+    "first_seen": "2025-08-01T17:17:39",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:17:39"
+      }
+    ],
+    "last_active": "2025-08-01T17:17:39"
+  },
+  "5768231119": {
+    "first_name": "Rawan",
+    "last_name": "",
+    "username": "rawansalit",
+    "first_seen": "2025-08-01T17:28:46",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:28:46"
+      }
+    ],
+    "last_active": "2025-08-01T17:28:46"
+  },
+  "5714902453": {
+    "first_name": "You§ef",
+    "last_name": "",
+    "username": "Y_ou_s_sef",
+    "first_seen": "2025-08-01T17:30:08",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:30:08"
+      }
+    ],
+    "last_active": "2025-08-01T17:30:08"
+  },
+  "1089215693": {
+    "first_name": "Nabil mahammed",
+    "last_name": "",
+    "username": "NabilMahammed",
+    "first_seen": "2025-08-01T17:30:59",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:30:59"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:33:49"
+      }
+    ],
+    "last_active": "2025-08-01T17:33:49"
+  },
+  "1951970954": {
+    "first_name": "Siba",
+    "last_name": "",
+    "username": "sleepy_82",
+    "first_seen": "2025-08-01T17:33:29",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:33:29"
+      }
+    ],
+    "last_active": "2025-08-01T17:33:29"
+  },
+  "6210192552": {
+    "first_name": "SAMA",
+    "last_name": "",
+    "username": "SAMA_FD",
+    "first_seen": "2025-08-01T17:33:57",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:33:57"
+      }
+    ],
+    "last_active": "2025-08-01T17:33:57"
+  },
+  "6262723158": {
+    "first_name": "Tayseer",
+    "last_name": "",
+    "username": "TAYSERSALALH",
+    "first_seen": "2025-08-01T17:37:26",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:37:26"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:38:45"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T17:41:20"
+      }
+    ],
+    "last_active": "2025-08-01T17:41:20"
+  },
+  "2059082800": {
+    "first_name": "Bassam Hossam Elalfy",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T17:38:36",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:38:36"
+      }
+    ],
+    "last_active": "2025-08-01T17:38:36"
+  },
+  "5912813765": {
+    "first_name": "Salma Shalaby",
+    "last_name": "",
+    "username": "si8rx",
+    "first_seen": "2025-08-01T17:40:24",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:40:24"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T18:12:26"
+      }
+    ],
+    "last_active": "2025-08-01T18:12:26"
+  },
+  "6794345593": {
+    "first_name": "Jana Allam",
+    "last_name": "",
+    "username": "DRgigi221",
+    "first_seen": "2025-08-01T17:45:56",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T17:45:56"
+      }
+    ],
+    "last_active": "2025-08-01T17:45:56"
+  },
+  "6343182282": {
+    "first_name": "shams",
+    "last_name": "",
+    "username": "sunfhs",
+    "first_seen": "2025-08-01T17:55:57",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T17:55:57"
+      }
+    ],
+    "last_active": "2025-08-01T17:55:57"
+  },
+  "8238202233": {
+    "first_name": "يارب سامو يقفل♥♥",
+    "last_name": "",
+    "username": "Drsammmooo152008",
+    "first_seen": "2025-08-01T18:02:45",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T18:02:45"
+      }
+    ],
+    "last_active": "2025-08-01T18:02:45"
+  },
+  "807625265": {
+    "first_name": "َBoghdady",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T18:05:28",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T18:05:28"
+      }
+    ],
+    "last_active": "2025-08-01T18:05:28"
+  },
+  "7095113481": {
+    "first_name": "Joa mo",
+    "last_name": "",
+    "username": "joa2mo",
+    "first_seen": "2025-08-01T18:15:15",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T18:15:15"
+      }
+    ],
+    "last_active": "2025-08-01T18:15:15"
+  },
+  "1515635659": {
+    "first_name": "Sa",
+    "last_name": "",
+    "username": "marsa_a3",
+    "first_seen": "2025-08-01T18:35:42",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T18:35:42"
+      }
+    ],
+    "last_active": "2025-08-01T18:35:42"
+  },
+  "6578318382": {
+    "first_name": "Tabarak",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T18:41:27",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T18:41:27"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T10:15:49"
+      }
+    ],
+    "last_active": "2025-08-02T10:15:49"
+  },
+  "6432617870": {
+    "first_name": "Ahmed El-sayed",
+    "last_name": "",
+    "username": "Ahmed_El_sayed_haaa",
+    "first_seen": "2025-08-01T18:54:19",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T18:54:19"
+      }
+    ],
+    "last_active": "2025-08-01T18:54:19"
+  },
+  "1121692148": {
+    "first_name": "𝐵𝑎𝑠𝑚𝑎𝑙𝑎♡",
+    "last_name": "",
+    "username": "basmalataha155",
+    "first_seen": "2025-08-01T19:09:51",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T19:09:51"
+      }
+    ],
+    "last_active": "2025-08-01T19:09:51"
+  },
+  "6675253641": {
+    "first_name": "⚡️ S+T∆DΞNT",
+    "last_name": "",
+    "username": "ABD2009m",
+    "first_seen": "2025-08-01T19:41:13",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T19:41:13"
+      }
+    ],
+    "last_active": "2025-08-01T19:41:13"
+  },
+  "1520227870": {
+    "first_name": "𝓜𝓪𝓻𝓲𝓪𝓶 𝓔𝓵𝓫𝓪𝓱𝓻𝓪𝔀𝔂",
+    "last_name": "",
+    "username": "mariamelbahrawy",
+    "first_seen": "2025-08-01T19:50:41",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T19:50:41"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T04:27:21"
+      }
+    ],
+    "last_active": "2025-08-02T04:27:21"
+  },
+  "5570424047": {
+    "first_name": "~°°",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T20:03:06",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T20:03:06"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T20:05:00"
+      }
+    ],
+    "last_active": "2025-08-01T20:05:00"
+  },
+  "6002776416": {
+    "first_name": "𝓜𝓪𝓻𝔂𝓪𝓶🗝️",
+    "last_name": "",
+    "username": "benim0011",
+    "first_seen": "2025-08-01T20:16:18",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T20:16:18"
+      }
+    ],
+    "last_active": "2025-08-01T20:16:18"
+  },
+  "5914417601": {
+    "first_name": "D.r Jana Nasr",
+    "last_name": "",
+    "username": "Jana_Nasr",
+    "first_seen": "2025-08-01T20:39:33",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T20:39:33"
+      }
+    ],
+    "last_active": "2025-08-01T20:39:33"
+  },
+  "7297486289": {
+    "first_name": "مـ",
+    "last_name": "",
+    "username": "amira_m7mdd",
+    "first_seen": "2025-08-01T20:44:19",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T20:44:19"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T20:46:06"
+      }
+    ],
+    "last_active": "2025-08-01T20:46:06"
+  },
+  "462976111": {
+    "first_name": ".",
+    "last_name": "",
+    "username": "Maioii5",
+    "first_seen": "2025-08-01T21:01:51",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T21:01:51"
+      }
+    ],
+    "last_active": "2025-08-01T21:01:51"
+  },
+  "5669330059": {
+    "first_name": "Mazen",
+    "last_name": "",
+    "username": "mazen_xv",
+    "first_seen": "2025-08-01T21:10:06",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T21:10:06"
+      }
+    ],
+    "last_active": "2025-08-01T21:10:06"
+  },
+  "1085228859": {
+    "first_name": "Maryam Mahmoud",
+    "last_name": "",
+    "username": "Maryam_1949",
+    "first_seen": "2025-08-01T21:26:34",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T21:26:34"
+      }
+    ],
+    "last_active": "2025-08-01T21:26:34"
+  },
+  "1612801924": {
+    "first_name": "🌿𝒉. 𝒏🌿",
+    "last_name": "",
+    "username": "nyno_2008",
+    "first_seen": "2025-08-01T21:26:40",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T21:26:40"
+      }
+    ],
+    "last_active": "2025-08-01T21:26:40"
+  },
+  "5586690140": {
+    "first_name": "Sohaila Ahmed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T21:33:20",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T21:33:20"
+      }
+    ],
+    "last_active": "2025-08-01T21:33:20"
+  },
+  "8383936410": {
+    "first_name": "حابسه نمله و معذباها.🇪🇬",
+    "last_name": "",
+    "username": "Dr_HAGER_1",
+    "first_seen": "2025-08-01T21:42:03",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T21:42:03"
+      }
+    ],
+    "last_active": "2025-08-01T21:42:03"
+  },
+  "6518233466": {
+    "first_name": "𝕷𝖓𝖆🌹",
+    "last_name": "",
+    "username": "Lna_139",
+    "first_seen": "2025-08-01T21:45:13",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T21:45:13"
+      }
+    ],
+    "last_active": "2025-08-01T21:45:13"
+  },
+  "8051760439": {
+    "first_name": "ريوانه",
+    "last_name": "",
+    "username": "rewan_mourvd",
+    "first_seen": "2025-08-01T21:58:49",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T21:58:49"
+      }
+    ],
+    "last_active": "2025-08-01T21:58:49"
+  },
+  "7422473506": {
+    "first_name": "Roma",
+    "last_name": "",
+    "username": "Shaerop",
+    "first_seen": "2025-08-01T22:00:32",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T22:00:32"
+      }
+    ],
+    "last_active": "2025-08-01T22:00:32"
+  },
+  "6779558614": {
+    "first_name": "يُوسُفْ | 🇮🇶",
+    "last_name": "",
+    "username": "Dr_usef",
+    "first_seen": "2025-08-01T22:00:47",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T22:00:47"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:28:40"
+      }
+    ],
+    "last_active": "2025-08-01T22:00:47"
+  },
+  "1584266018": {
+    "first_name": "amani",
+    "last_name": "",
+    "username": "amani_000_0",
+    "first_seen": "2025-08-01T22:07:54",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T22:07:54"
+      }
+    ],
+    "last_active": "2025-08-01T22:07:54"
+  },
+  "5562420629": {
+    "first_name": "D‌",
+    "last_name": "",
+    "username": "T_5882",
+    "first_seen": "2025-08-01T22:21:14",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T22:21:14"
+      }
+    ],
+    "last_active": "2025-08-01T22:21:14"
+  },
+  "1342765020": {
+    "first_name": "حازم علي َ",
+    "last_name": "",
+    "username": "hazemaly7",
+    "first_seen": "2025-08-01T22:43:25",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T22:43:25"
+      }
+    ],
+    "last_active": "2025-08-01T22:43:25"
+  },
+  "1899360486": {
+    "first_name": "𝘉𝘶𝘵𝘵𝘦𝘳𝘧𝘭𝘺 🦋",
+    "last_name": "",
+    "username": "hayoyaaa",
+    "first_seen": "2025-08-01T22:50:40",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T22:50:40"
+      }
+    ],
+    "last_active": "2025-08-01T22:50:40"
+  },
+  "13182594": {
+    "first_name": "ُ",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T23:10:01",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T23:10:01"
+      }
+    ],
+    "last_active": "2025-08-01T23:10:01"
+  },
+  "1140416350": {
+    "first_name": "A",
+    "last_name": "",
+    "username": "Ha_4628",
+    "first_seen": "2025-08-02T00:35:01",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T00:35:01"
+      }
+    ],
+    "last_active": "2025-08-02T00:35:01"
+  },
+  "6840005338": {
+    "first_name": "𝙺𝙷𝙰𝙻𝙴𝙳 | خالد",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-02T00:41:09",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T00:41:09"
+      }
+    ],
+    "last_active": "2025-08-02T00:41:09"
+  },
+  "7230724042": {
+    "first_name": "Aya Ayman",
+    "last_name": "",
+    "username": "drayaayman",
+    "first_seen": "2025-08-02T00:57:24",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T00:57:24"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T00:58:03"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T00:58:59"
+      }
+    ],
+    "last_active": "2025-08-02T00:58:59"
+  },
+  "1112276487": {
+    "first_name": "Janna Ahmed",
+    "last_name": "",
+    "username": "jjj_jn0",
+    "first_seen": "2025-08-02T01:22:12",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T01:22:12"
+      }
+    ],
+    "last_active": "2025-08-02T01:22:12"
+  },
+  "7646522930": {
+    "first_name": "used to be",
+    "last_name": "",
+    "username": "premaadonna",
+    "first_seen": "2025-08-02T04:54:18",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T04:54:18"
+      }
+    ],
+    "last_active": "2025-08-02T04:54:18"
+  },
+  "5895442848": {
+    "first_name": "♡",
+    "last_name": "",
+    "username": "Hdkdk23",
+    "first_seen": "2025-08-02T05:01:28",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T05:01:28"
+      }
+    ],
+    "last_active": "2025-08-02T05:01:28"
+  },
+  "8384263066": {
+    "first_name": "Ahmed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-02T05:15:10",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T05:15:10"
+      }
+    ],
+    "last_active": "2025-08-02T05:15:10"
+  },
+  "1686947475": {
+    "first_name": "Hana Hassan",
+    "last_name": "",
+    "username": "H_an_a2008",
+    "first_seen": "2025-08-02T05:56:30",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T05:56:30"
+      }
+    ],
+    "last_active": "2025-08-02T05:56:30"
+  },
+  "7400123057": {
+    "first_name": "𝔼ℝ𝔼ℕ Ý𝔼𝔸𝔾𝔼ℝ𝐅𝐓𝐅",
+    "last_name": "",
+    "username": "ErenYeager90900",
+    "first_seen": "2025-08-02T08:23:25",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T08:23:25"
+      }
+    ],
+    "last_active": "2025-08-02T08:23:25"
+  },
+  "7878520433": {
+    "first_name": "A",
+    "last_name": "",
+    "username": "as_ezz1",
+    "first_seen": "2025-08-02T08:33:25",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T08:33:25"
+      }
+    ],
+    "last_active": "2025-08-02T08:33:25"
+  },
+  "5772439305": {
+    "first_name": "D",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-02T11:19:36",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T11:19:36"
+      }
+    ],
+    "last_active": "2025-08-02T11:19:36"
+  },
+  "6541212886": {
+    "first_name": "oMniah",
+    "last_name": "",
+    "username": "byomniah",
+    "first_seen": "2025-08-02T11:48:33",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T11:48:33"
+      }
+    ],
+    "last_active": "2025-08-02T11:48:33"
+  },
+  "2055458774": {
+    "first_name": "~ .",
+    "last_name": "",
+    "username": "shshsh12038",
+    "first_seen": "2025-08-02T11:52:12",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T11:52:12"
+      }
+    ],
+    "last_active": "2025-08-02T11:52:12"
+  },
+  "5286431669": {
+    "first_name": "علي",
+    "last_name": "",
+    "username": "a_m_a_ab",
+    "first_seen": "2025-08-02T12:42:57",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-02T12:42:57"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:23:00"
+      }
+    ],
+    "last_active": "2025-08-02T12:42:57"
+  },
+  "6471590532": {
+    "first_name": "Bsmala",
+    "last_name": "",
+    "username": "Bsmala111",
+    "first_seen": "2025-08-02T13:10:57",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T13:10:57"
+      }
+    ],
+    "last_active": "2025-08-02T13:10:57"
+  },
+  "5185666371": {
+    "first_name": "نورالدين بن محمود إحسان",
+    "last_name": "",
+    "username": "noUReldeENehasn",
+    "first_seen": "2025-08-02T13:42:34",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T13:42:34"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:12:08"
+      }
+    ],
+    "last_active": "2025-08-02T13:42:34"
+  },
+  "7397860028": {
+    "first_name": "JANA HANY",
+    "last_name": "",
+    "username": "Mysay_Jana",
+    "first_seen": "2025-08-02T13:57:48",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T13:57:48"
+      }
+    ],
+    "last_active": "2025-08-02T13:57:48"
+  },
+  "1661071454": {
+    "first_name": "𝐓𝐚𝐦𝐞𝐞𝐦",
+    "last_name": "",
+    "username": "T_XAO47",
+    "first_seen": "2025-08-02T14:00:11",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T14:00:11"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:05:07"
+      }
+    ],
+    "last_active": "2025-08-02T14:00:11"
+  },
+  "1068268572": {
+    "first_name": "….🍀",
+    "last_name": "",
+    "username": "AseelJomaa",
+    "first_seen": "2025-08-02T14:03:28",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T14:03:28"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-02T14:15:21"
+      }
+    ],
+    "last_active": "2025-08-02T14:15:21"
+  },
+  "5713095894": {
+    "first_name": "Menna Ahmed Abozaid❤️👩‍🎨🌏",
+    "last_name": "",
+    "username": "menna_ahmed_amr",
+    "first_seen": "2025-08-02T14:23:59",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-02T14:23:59"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:06:45"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:08:40"
+      }
+    ],
+    "last_active": "2025-08-02T14:23:59"
+  },
+  "5926363823": {
+    "first_name": "Eslam",
+    "last_name": "",
+    "username": "Eslam_kl",
+    "first_seen": "2025-07-31T18:03:52",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-07-31T18:03:52"
+      }
+    ],
+    "last_active": "2025-07-31T18:03:52"
+  },
+  "7682606745": {
+    "first_name": "Abdelrahman Waleed",
+    "last_name": "",
+    "username": "AWE_2007",
+    "first_seen": "2025-07-31T19:06:17",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-07-31T19:06:17"
+      }
+    ],
+    "last_active": "2025-07-31T19:06:17"
+  },
+  "820037837": {
+    "first_name": "يارب جنا تجيب 100% في القدرات",
+    "last_name": "",
+    "username": "jr_ooj16",
+    "first_seen": "2025-08-01T15:01:18",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:01:18"
+      }
+    ],
+    "last_active": "2025-08-01T15:01:18"
+  },
+  "1623816546": {
+    "first_name": "\"اذكر ربك\"",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:01:46",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:01:46"
+      }
+    ],
+    "last_active": "2025-08-01T15:01:46"
+  },
+  "1129822952": {
+    "first_name": "Hazem Mohamed",
+    "last_name": "",
+    "username": "Hazemmo23",
+    "first_seen": "2025-08-01T15:01:47",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:01:47"
+      }
+    ],
+    "last_active": "2025-08-01T15:01:47"
+  },
+  "1731022968": {
+    "first_name": "malak",
+    "last_name": "",
+    "username": "m7nfee",
+    "first_seen": "2025-08-01T15:01:47",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:01:47"
+      }
+    ],
+    "last_active": "2025-08-01T15:01:47"
+  },
+  "7064507978": {
+    "first_name": "Faris",
+    "last_name": "",
+    "username": "just_fariss",
+    "first_seen": "2025-08-01T15:02:01",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:02:01"
+      }
+    ],
+    "last_active": "2025-08-01T15:02:01"
+  },
+  "5414658263": {
+    "first_name": "Mariam Ahmed",
+    "last_name": "",
+    "username": "mariam_ahmed09",
+    "first_seen": "2025-08-01T15:02:07",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:02:07"
+      }
+    ],
+    "last_active": "2025-08-01T15:02:07"
+  },
+  "5060286725": {
+    "first_name": "abdelrahman abdelwahed",
+    "last_name": "",
+    "username": "abdoxxxxk1997",
+    "first_seen": "2025-08-01T15:02:32",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:02:32"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:03:48"
+      }
+    ],
+    "last_active": "2025-08-01T15:03:48"
+  },
+  "7272820126": {
+    "first_name": "rema",
+    "last_name": "",
+    "username": "ryumm1",
+    "first_seen": "2025-08-01T15:02:57",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:02:57"
+      }
+    ],
+    "last_active": "2025-08-01T15:02:57"
+  },
+  "6307624858": {
+    "first_name": "𝐀𝐌𝐈𝐑𝐀ᶜˡᵒˢᵉᵈ",
+    "last_name": "",
+    "username": "Amira7100",
+    "first_seen": "2025-08-01T15:03:48",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:03:48"
+      }
+    ],
+    "last_active": "2025-08-01T15:03:48"
+  },
+  "1096791624": {
+    "first_name": "sαℓмα",
+    "last_name": "",
+    "username": "sl280",
+    "first_seen": "2025-08-01T15:04:17",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:04:17"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:16:48"
+      }
+    ],
+    "last_active": "2025-08-01T15:16:48"
+  },
+  "1420930693": {
+    "first_name": "الـبرَاء أحمَـد 🪐",
+    "last_name": "",
+    "username": "B_wiih8",
+    "first_seen": "2025-08-01T15:04:27",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:04:27"
+      }
+    ],
+    "last_active": "2025-08-01T15:04:27"
+  },
+  "6241757372": {
+    "first_name": "Mohamed Elbasiony",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:04:36",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:04:36"
+      }
+    ],
+    "last_active": "2025-08-01T15:04:36"
+  },
+  "1657532334": {
+    "first_name": "𝓙𝓪𝓷𝓪 𓂀🇪🇬",
+    "last_name": "",
+    "username": "j4viq",
+    "first_seen": "2025-08-01T15:04:38",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:04:38"
+      }
+    ],
+    "last_active": "2025-08-01T15:04:38"
+  },
+  "6342277749": {
+    "first_name": "Abdulla Ashraf",
+    "last_name": "",
+    "username": "Abdulla1_7",
+    "first_seen": "2025-08-01T15:04:41",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:04:41"
+      }
+    ],
+    "last_active": "2025-08-01T15:04:41"
+  },
+  "1777854641": {
+    "first_name": "Youssef",
+    "last_name": "",
+    "username": "yj_7e",
+    "first_seen": "2025-08-01T15:05:02",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:05:02"
+      }
+    ],
+    "last_active": "2025-08-01T15:05:02"
+  },
+  "6365953900": {
+    "first_name": "Habiba Mohamed",
+    "last_name": "",
+    "username": "Hmimeoo",
+    "first_seen": "2025-08-01T15:05:56",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:05:56"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:06:47"
+      }
+    ],
+    "last_active": "2025-08-01T15:06:47"
+  },
+  "1987102206": {
+    "first_name": "Walaa Mohamed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:06:05",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:06:05"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:07:00"
+      }
+    ],
+    "last_active": "2025-08-01T15:07:00"
+  },
+  "1139117047": {
+    "first_name": "Skully Got 💯 الحمدلله",
+    "last_name": "",
+    "username": "AhmedSkully",
+    "first_seen": "2025-08-01T15:06:10",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:06:10"
+      }
+    ],
+    "last_active": "2025-08-01T15:06:10"
+  },
+  "1916275188": {
+    "first_name": "~A",
+    "last_name": "",
+    "username": "afnan20008",
+    "first_seen": "2025-08-01T15:06:12",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:06:12"
+      }
+    ],
+    "last_active": "2025-08-01T15:06:12"
+  },
+  "5026530236": {
+    "first_name": "𝒢✨",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:06:30",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:06:30"
+      }
+    ],
+    "last_active": "2025-08-01T15:06:30"
+  },
+  "5885226547": {
+    "first_name": "حَنِيْنْ🤎",
+    "last_name": "",
+    "username": "Neno255h",
+    "first_seen": "2025-08-01T15:06:58",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:06:58"
+      }
+    ],
+    "last_active": "2025-08-01T15:06:58"
+  },
+  "6546922283": {
+    "first_name": "𝓡𝓸𝓼𝓮 🍉",
+    "last_name": "",
+    "username": "Rose_15_0",
+    "first_seen": "2025-08-01T15:07:01",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:07:01"
+      }
+    ],
+    "last_active": "2025-08-01T15:07:01"
+  },
+  "7179943616": {
+    "first_name": "Ali HATAB",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:07:25",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:07:25"
+      }
+    ],
+    "last_active": "2025-08-01T15:07:25"
+  },
+  "1166324638": {
+    "first_name": "آمال🎓🤍..",
+    "last_name": "",
+    "username": "aaam_25",
+    "first_seen": "2025-08-01T15:08:01",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:08:01"
+      }
+    ],
+    "last_active": "2025-08-01T15:08:01"
+  },
+  "6154263814": {
+    "first_name": "د يـوسـ𓂆ـف",
+    "last_name": "",
+    "username": "vvip_600",
+    "first_seen": "2025-08-01T15:08:02",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:08:02"
+      }
+    ],
+    "last_active": "2025-08-01T15:08:02"
+  },
+  "8125865747": {
+    "first_name": "yousef elnaggar",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:08:39",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:08:39"
+      }
+    ],
+    "last_active": "2025-08-01T15:08:39"
+  },
+  "6341601230": {
+    "first_name": "مِنَة عادِل",
+    "last_name": "",
+    "username": "Mennahadelkassem",
+    "first_seen": "2025-08-01T15:09:16",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:09:16"
+      }
+    ],
+    "last_active": "2025-08-01T15:09:16"
+  },
+  "7152884454": {
+    "first_name": "Rawan",
+    "last_name": "",
+    "username": "Rowaan2009",
+    "first_seen": "2025-08-01T15:09:32",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:09:32"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:14:02"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:19:32"
+      }
+    ],
+    "last_active": "2025-08-01T15:19:32"
+  },
+  "1174537677": {
+    "first_name": "• َ𝒎7𝒎𝒅 | 🇪🇬",
+    "last_name": "",
+    "username": "Medo_13111",
+    "first_seen": "2025-08-01T15:10:03",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:10:03"
+      }
+    ],
+    "last_active": "2025-08-01T15:10:03"
+  },
+  "1749590809": {
+    "first_name": "Roro 🇪🇬",
+    "last_name": "",
+    "username": "arwam27",
+    "first_seen": "2025-08-01T15:10:19",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:10:19"
+      }
+    ],
+    "last_active": "2025-08-01T15:10:19"
+  },
+  "5571568291": {
+    "first_name": "Malak Mohamed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:11:35",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:11:35"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:13:04"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:15:10"
+      }
+    ],
+    "last_active": "2025-08-01T15:15:10"
+  },
+  "6974509383": {
+    "first_name": "Salma Salah",
+    "last_name": "",
+    "username": "sallx17",
+    "first_seen": "2025-08-01T15:11:59",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:11:59"
+      }
+    ],
+    "last_active": "2025-08-01T15:11:59"
+  },
+  "5968785517": {
+    "first_name": "H 🎀♡ ›",
+    "last_name": "",
+    "username": "ha_2009_28",
+    "first_seen": "2025-08-01T15:12:26",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:12:26"
+      }
+    ],
+    "last_active": "2025-08-01T15:12:26"
+  },
+  "5306114373": {
+    "first_name": "🕊️📿",
+    "last_name": "",
+    "username": "Qzitp69",
+    "first_seen": "2025-08-01T15:12:39",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:12:39"
+      },
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:13:19"
+      }
+    ],
+    "last_active": "2025-08-01T15:13:19"
+  },
+  "6694512825": {
+    "first_name": "طارق",
+    "last_name": "",
+    "username": "KELUA_99",
+    "first_seen": "2025-08-01T15:13:46",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:13:46"
+      }
+    ],
+    "last_active": "2025-08-01T15:13:46"
+  },
+  "5192427304": {
+    "first_name": "Rokia Mohamed",
+    "last_name": "",
+    "username": "R1ghb",
+    "first_seen": "2025-08-01T15:14:25",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:14:25"
+      }
+    ],
+    "last_active": "2025-08-01T15:14:25"
+  },
+  "1158088543": {
+    "first_name": "𝐑𝐨𝐚𝐚 𓂀",
+    "last_name": "",
+    "username": "roaaaaa_176",
+    "first_seen": "2025-08-01T15:14:27",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:14:27"
+      }
+    ],
+    "last_active": "2025-08-01T15:14:27"
+  },
+  "5259260526": {
+    "first_name": "Bassant",
+    "last_name": "",
+    "username": "bs_nt1",
+    "first_seen": "2025-08-01T15:14:32",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:14:32"
+      }
+    ],
+    "last_active": "2025-08-01T15:14:32"
+  },
+  "6226520422": {
+    "first_name": "Mohamed",
+    "last_name": "",
+    "username": "Mohamed9002A",
+    "first_seen": "2025-08-01T15:14:48",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:14:48"
+      },
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:30:29"
+      }
+    ],
+    "last_active": "2025-08-01T15:30:29"
+  },
+  "5498122210": {
+    "first_name": "الحمدلله",
+    "last_name": "",
+    "username": "G_5_K",
+    "first_seen": "2025-08-01T15:15:35",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:15:35"
+      }
+    ],
+    "last_active": "2025-08-01T15:15:35"
+  },
+  "1742544347": {
+    "first_name": "FIVE",
+    "last_name": "",
+    "username": "Rkpff",
+    "first_seen": "2025-08-01T15:15:40",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:15:40"
+      }
+    ],
+    "last_active": "2025-08-01T15:15:40"
+  },
+  "1368462115": {
+    "first_name": "Salsabil",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:15:46",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:15:46"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:38:36"
+      }
+    ],
+    "last_active": "2025-08-01T15:38:36"
+  },
+  "1925836046": {
+    "first_name": "Noha🌹",
+    "last_name": "",
+    "username": "Nnono_34",
+    "first_seen": "2025-08-01T15:15:50",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:15:50"
+      }
+    ],
+    "last_active": "2025-08-01T15:15:50"
+  },
+  "5200646776": {
+    "first_name": "Mohanad Elsayed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:16:32",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:16:32"
+      }
+    ],
+    "last_active": "2025-08-01T15:16:32"
+  },
+  "1257943639": {
+    "first_name": "Mariam Zakzouk",
+    "last_name": "",
+    "username": "MWZ5308",
+    "first_seen": "2025-08-01T15:17:47",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:17:47"
+      }
+    ],
+    "last_active": "2025-08-01T15:17:47"
+  },
+  "5153152969": {
+    "first_name": "Mary( يارب أقفل قدرات )",
+    "last_name": "",
+    "username": "boredmary00",
+    "first_seen": "2025-08-01T15:18:26",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:18:26"
+      }
+    ],
+    "last_active": "2025-08-01T15:18:26"
+  },
+  "6472902007": {
+    "first_name": "kh kh",
+    "last_name": "",
+    "username": "rkhkh2008",
+    "first_seen": "2025-08-01T15:19:01",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:19:01"
+      }
+    ],
+    "last_active": "2025-08-01T15:19:01"
+  },
+  "7444227525": {
+    "first_name": "نـفرتـاري",
+    "last_name": "",
+    "username": "Sh0_ya",
+    "first_seen": "2025-08-01T15:20:55",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:20:55"
+      }
+    ],
+    "last_active": "2025-08-01T15:20:55"
+  },
+  "5365386347": {
+    "first_name": "25",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:21:14",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:21:14"
+      }
+    ],
+    "last_active": "2025-08-01T15:21:14"
+  },
+  "1146307794": {
+    "first_name": "Mariem Mohammed",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:23:02",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:23:02"
+      }
+    ],
+    "last_active": "2025-08-01T15:23:02"
+  },
+  "7269592919": {
+    "first_name": "نيـچار عِـماد🤎.",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:27:28",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:27:28"
+      }
+    ],
+    "last_active": "2025-08-01T15:27:28"
+  },
+  "6982167957": {
+    "first_name": "علبة عصير",
+    "last_name": "",
+    "username": "Satoru21",
+    "first_seen": "2025-08-01T15:28:18",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:28:18"
+      }
+    ],
+    "last_active": "2025-08-01T15:28:18"
+  },
+  "6706042551": {
+    "first_name": "Zahraa Ahmed.",
+    "last_name": "",
+    "username": "rarityy1429",
+    "first_seen": "2025-08-01T15:31:58",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:31:58"
+      }
+    ],
+    "last_active": "2025-08-01T15:31:58"
+  },
+  "5447027187": {
+    "first_name": "َ",
+    "last_name": "",
+    "username": "Ukjdjb",
+    "first_seen": "2025-08-01T15:32:41",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:32:41"
+      }
+    ],
+    "last_active": "2025-08-01T15:32:41"
+  },
+  "6775738284": {
+    "first_name": "..",
+    "last_name": "",
+    "username": "لا يوجد username",
+    "first_seen": "2025-08-01T15:33:08",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:33:08"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:34:35"
+      }
+    ],
+    "last_active": "2025-08-01T15:34:35"
+  },
+  "5756713364": {
+    "first_name": "Shrook",
+    "last_name": "",
+    "username": "E5ng89",
+    "first_seen": "2025-08-01T15:33:48",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:33:48"
+      }
+    ],
+    "last_active": "2025-08-01T15:33:48"
+  },
+  "1806925783": {
+    "first_name": "Asmaa",
+    "last_name": "",
+    "username": "I8d26",
+    "first_seen": "2025-08-01T15:37:17",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:37:17"
+      }
+    ],
+    "last_active": "2025-08-01T15:37:17"
+  },
+  "7978772911": {
+    "first_name": "Nacho",
+    "last_name": "",
+    "username": "g4h_2",
+    "first_seen": "2025-08-01T15:40:21",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:40:21"
+      }
+    ],
+    "last_active": "2025-08-01T15:40:21"
+  },
+  "2035715877": {
+    "first_name": "M 7",
+    "last_name": "",
+    "username": "d7o6m",
+    "first_seen": "2025-08-01T15:42:10",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:42:10"
+      },
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:45:45"
+      }
+    ],
+    "last_active": "2025-08-01T15:45:45"
+  },
+  "1279139323": {
+    "first_name": "Shahd Yasser",
+    "last_name": "",
+    "username": "DrShahd26",
+    "first_seen": "2025-08-01T15:42:19",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:42:19"
+      }
+    ],
+    "last_active": "2025-08-01T15:42:19"
+  },
+  "7671360132": {
+    "first_name": "حَنِين•",
+    "last_name": "",
+    "username": "han_01",
+    "first_seen": "2025-08-01T15:43:45",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:43:45"
+      }
+    ],
+    "last_active": "2025-08-01T15:43:45"
+  },
+  "1836833323": {
+    "first_name": "رِيتَال 𓂀",
+    "last_name": "",
+    "username": "retalmhmd_17",
+    "first_seen": "2025-08-01T15:46:00",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:46:00"
+      }
+    ],
+    "last_active": "2025-08-01T15:46:00"
+  },
+  "5685389782": {
+    "first_name": "Basmala𓂀",
+    "last_name": "",
+    "username": "basmalaagaber",
+    "first_seen": "2025-08-01T15:47:39",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:47:39"
+      }
+    ],
+    "last_active": "2025-08-01T15:47:39"
+  },
+  "1552118353": {
+    "first_name": "عبدالمُنعِمـ",
+    "last_name": "",
+    "username": "AbdulmonemZidan",
+    "first_seen": "2025-08-01T15:49:35",
+    "applications": [
+      {
+        "team_id": "team_collections",
+        "team_name": "تيم التجميعات",
+        "timestamp": "2025-08-01T15:49:35"
+      }
+    ],
+    "last_active": "2025-08-01T15:49:35"
+  },
+  "7117087677": {
+    "first_name": "Senior 2026 🎓",
+    "last_name": "",
+    "username": "QFGJDEMM",
+    "first_seen": "2025-08-01T15:53:07",
+    "applications": [
+      {
+        "team_id": "team_exams",
+        "team_name": "تيم الاختبارات",
+        "timestamp": "2025-08-01T15:53:07"
+      }
+    ],
+    "last_active": "2025-08-01T15:53:07"
+  },
+  "6287928813": {
+    "first_name": "Youssef",
+    "last_name": "",
+    "username": "yr10_e",
+    "first_seen": "2025-08-01T15:53:26",
+    "applications": [
+      {
+        "team_id": "team_social",
+        "team_name": "تيم السوشيال",
+        "timestamp": "2025-08-01T15:53:26"
+      }
+    ],
+    "last_active": "2025-08-01T15:53:26"
   }
 }
